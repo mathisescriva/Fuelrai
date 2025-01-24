@@ -103,13 +103,45 @@ export const KIDManager = () => {
       </div>
 
       <div className="flex gap-8">
-        {/* Section de gauche : Prévisualisation et liste des KIDs */}
+        {/* Section de gauche : Liste des KIDs et Prévisualisation */}
         <div className="w-2/3 space-y-6">
+          {/* Liste des KIDs */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Documents KID</h2>
+            <div className="grid grid-cols-3 gap-4">
+              {kids.map((kid) => (
+                <div
+                  key={kid.id}
+                  onClick={() => selectKid(kid)}
+                  className={`bg-gray-50 rounded-xl p-4 cursor-pointer transition-all hover:shadow-md border-2
+                    ${selectedKid?.id === kid.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'}`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-red-50 rounded-lg">
+                      <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900 line-clamp-1">{kid.name}</h3>
+                      <p className="text-sm text-gray-500">PDF Document</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {kids.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p>Aucun KID uploadé. Utilisez le bouton en haut pour ajouter des documents.</p>
+              </div>
+            )}
+          </div>
+
           {/* Prévisualisation du PDF */}
           {selectedKid ? (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-800">{selectedKid.name}</h2>
+                <h2 className="text-lg font-semibold text-gray-800">Prévisualisation</h2>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
@@ -224,81 +256,131 @@ export const KIDManager = () => {
               </div>
             </div>
           )}
-
-          {/* Liste des KIDs */}
-          <div className="grid grid-cols-3 gap-4">
-            {kids.map((kid) => (
-              <div
-                key={kid.id}
-                onClick={() => selectKid(kid)}
-                className={`bg-white rounded-xl shadow-sm p-4 cursor-pointer transition-all hover:shadow-md
-                  ${selectedKid?.id === kid.id ? 'ring-2 ring-blue-500' : ''}`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-red-50 rounded-lg">
-                    <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900 line-clamp-1">{kid.name}</h3>
-                    <p className="text-sm text-gray-500">PDF Document</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Section de droite : Informations détaillées */}
         <div className="w-1/3">
-          {selectedKid && kidInfo ? (
+          {selectedKid ? (
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Niveau de risque</h3>
-                <div className="flex gap-1">
-                  {Array.from({ length: 7 }).map((_, i) => (
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Analyse du KID</h2>
+              
+              {/* Niveau de risque */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-700">Niveau de risque</h3>
+                <div className="flex space-x-1">
+                  {[1, 2, 3, 4, 5, 6, 7].map((level) => (
                     <div
-                      key={i}
-                      className={`flex-1 h-2 rounded-full ${
-                        i + 1 <= kidInfo.riskLevel
-                          ? 'bg-gradient-to-r from-yellow-500 to-red-500'
-                          : 'bg-gray-200'
-                      }`}
+                      key={level}
+                      className={`h-2 flex-1 rounded ${
+                        level <= 3 ? 'bg-green-500' : level <= 5 ? 'bg-yellow-500' : 'bg-red-500'
+                      } ${level > 3 ? 'opacity-30' : ''}`}
                     />
                   ))}
                 </div>
-                <div className="mt-2 flex justify-between text-sm text-gray-500">
-                  <span>Faible</span>
-                  <span>Élevé</span>
+                <p className="text-sm text-gray-600">Risque moyen-faible (3/7)</p>
+              </div>
+
+              {/* Protection du capital */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-700">Protection du capital</h3>
+                <div className="relative h-4 bg-gray-200 rounded-full">
+                  <div
+                    className="absolute left-0 top-0 h-full bg-blue-500 rounded-full"
+                    style={{ width: '87.5%' }}
+                  />
+                </div>
+                <p className="text-sm text-gray-600">Protection à 87.5% du capital initial</p>
+              </div>
+
+              {/* Scénarios de performance */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-700">Scénarios de performance</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Favorable', value: 32.51, color: 'bg-green-500' },
+                    { label: 'Modéré', value: -4.91, color: 'bg-yellow-500' },
+                    { label: 'Défavorable', value: -4.91, color: 'bg-orange-500' },
+                    { label: 'Stress', value: -4.91, color: 'bg-red-500' }
+                  ].map((scenario) => (
+                    <div key={scenario.label} className="flex items-center">
+                      <span className="w-24 text-sm text-gray-600">{scenario.label}</span>
+                      <div className="flex-1 mx-2">
+                        <div className="h-2 rounded-full bg-gray-200">
+                          <div
+                            className={`h-full rounded-full ${scenario.color}`}
+                            style={{
+                              width: `${Math.max(0, Math.min(100, scenario.value + 100))}%`
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <span className="w-16 text-sm text-gray-600 text-right">
+                        {scenario.value > 0 ? '+' : ''}{scenario.value}%
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Prévisions de performance</h3>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Sur 1 an</span>
-                      <span className="text-green-600 font-medium">{kidInfo.oneYearForecast}</span>
+              {/* Coûts */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-700">Répartition des coûts</h3>
+                <div className="relative w-full h-48">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-800">0.36%</div>
+                        <div className="text-sm text-gray-600">Coût total</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Sur 5 ans</span>
-                      <span className="text-green-600 font-medium">{kidInfo.fiveYearForecast}</span>
-                    </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Coûts d'entrée</span>
+                    <span className="font-medium">0.36%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Coûts de sortie</span>
+                    <span className="font-medium">0.00%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Coûts récurrents</span>
+                    <span className="font-medium">0.00%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations supplémentaires */}
+              <div className="space-y-2">
+                <h3 className="font-medium text-gray-700">Informations clés</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">ISIN</p>
+                    <p className="font-medium">XS1914695009</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Devise</p>
+                    <p className="font-medium">EUR</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Échéance</p>
+                    <p className="font-medium">03 Mai 2024</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Émetteur</p>
+                    <p className="font-medium">BNP Paribas</p>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <div className="bg-white rounded-xl shadow-sm p-6 text-center">
               <div className="text-gray-400">
                 <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-lg">Sélectionnez un KID pour voir ses informations détaillées</p>
+                <p className="text-lg">Sélectionnez un KID pour voir son analyse détaillée</p>
               </div>
             </div>
           )}
