@@ -329,8 +329,8 @@ export const KIDManager = () => {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-xl font-bold text-gray-800">0.36%</div>
-                        <div className="text-sm text-gray-600">Coût total</div>
+                        <div className="text-xl font-bold text-gray-800">1.08%</div>
+                        <div className="text-sm text-gray-600">Coût total par an</div>
                       </div>
                     </div>
                   </div>
@@ -342,10 +342,18 @@ export const KIDManager = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Coûts de sortie</span>
+                    <span className="font-medium">0.50%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Coûts de transaction</span>
                     <span className="font-medium">0.00%</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Coûts récurrents</span>
+                    <span className="text-gray-600">Autres coûts récurrents</span>
+                    <span className="font-medium">0.00%</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Commissions de performance</span>
                     <span className="font-medium">0.00%</span>
                   </div>
                 </div>
@@ -360,16 +368,32 @@ export const KIDManager = () => {
                     <p className="font-medium">XS1914695009</p>
                   </div>
                   <div>
+                    <p className="text-sm text-gray-600">Émetteur</p>
+                    <p className="font-medium">BNP Paribas Issuance B.V.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Garant</p>
+                    <p className="font-medium">BNP Paribas S.A.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Autorité compétente</p>
+                    <p className="font-medium">AMF</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Date d'émission</p>
+                    <p className="font-medium">03 Mai 2019</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Date d'échéance</p>
+                    <p className="font-medium">03 Mai 2024</p>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-600">Devise</p>
                     <p className="font-medium">EUR</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Échéance</p>
-                    <p className="font-medium">03 Mai 2024</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Émetteur</p>
-                    <p className="font-medium">BNP Paribas</p>
+                    <p className="text-sm text-gray-600">Montant nominal</p>
+                    <p className="font-medium">1,000 EUR</p>
                   </div>
                 </div>
               </div>
