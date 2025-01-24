@@ -267,17 +267,55 @@ export const KIDManager = () => {
               {/* Niveau de risque */}
               <div className="space-y-2">
                 <h3 className="font-medium text-gray-700">Niveau de risque</h3>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5, 6, 7].map((level) => (
-                    <div
-                      key={level}
-                      className={`h-2 flex-1 rounded ${
-                        level <= 3 ? 'bg-green-500' : level <= 5 ? 'bg-yellow-500' : 'bg-red-500'
-                      } ${level > 3 ? 'opacity-30' : ''}`}
-                    />
-                  ))}
+                <div className="bg-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-200">
+                  <div className="flex space-x-1">
+                    {[1, 2, 3, 4, 5, 6, 7].map((level) => (
+                      <div
+                        key={level}
+                        className={`relative group cursor-pointer`}
+                        style={{ flex: 1 }}
+                      >
+                        <div
+                          className={`h-2 rounded transition-all duration-300 ${
+                            level <= 3
+                              ? 'bg-green-500 group-hover:bg-green-600'
+                              : level <= 5
+                              ? 'bg-yellow-500 group-hover:bg-yellow-600'
+                              : 'bg-red-500 group-hover:bg-red-600'
+                          } ${level > 3 ? 'opacity-30 group-hover:opacity-50' : ''}`}
+                        />
+                        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="bg-gray-800 text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                            Niveau {level}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex justify-between text-sm">
+                    <div className="flex items-center space-x-2 text-green-600">
+                      <div className="w-3 h-3 bg-green-500 rounded"></div>
+                      <span>Risque faible</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-yellow-600">
+                      <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                      <span>Risque moyen</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-red-600">
+                      <div className="w-3 h-3 bg-red-500 rounded"></div>
+                      <span>Risque élevé</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg transform hover:scale-105 transition-transform duration-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-blue-800 font-medium">Niveau actuel</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-blue-900 font-bold text-lg">3/7</span>
+                        <span className="text-blue-600 text-sm">(Risque moyen-faible)</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">Risque moyen-faible (3/7)</p>
               </div>
 
               {/* Protection du capital */}
@@ -326,29 +364,29 @@ export const KIDManager = () => {
               <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Répartition des coûts</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="text-gray-600">Coûts d'entrée</span>
-                    <span className="font-medium text-gray-900">0.36%</span>
+                  <div className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group">
+                    <span className="text-gray-600 group-hover:text-gray-900">Coûts d'entrée</span>
+                    <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">0.36%</span>
                   </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="text-gray-600">Coûts de sortie</span>
-                    <span className="font-medium text-gray-900">0.50%</span>
+                  <div className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group">
+                    <span className="text-gray-600 group-hover:text-gray-900">Coûts de sortie</span>
+                    <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">0.50%</span>
                   </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="text-gray-600">Coûts de transaction</span>
-                    <span className="font-medium text-gray-900">0.00%</span>
+                  <div className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group">
+                    <span className="text-gray-600 group-hover:text-gray-900">Coûts de transaction</span>
+                    <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">0.00%</span>
                   </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="text-gray-600">Autres coûts récurrents</span>
-                    <span className="font-medium text-gray-900">0.00%</span>
+                  <div className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group">
+                    <span className="text-gray-600 group-hover:text-gray-900">Autres coûts récurrents</span>
+                    <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">0.00%</span>
                   </div>
-                  <div className="flex justify-between items-center border-b pb-2">
-                    <span className="text-gray-600">Commissions de performance</span>
-                    <span className="font-medium text-gray-900">0.00%</span>
+                  <div className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group">
+                    <span className="text-gray-600 group-hover:text-gray-900">Commissions de performance</span>
+                    <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">0.00%</span>
                   </div>
-                  <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg mt-4">
-                    <span className="font-medium text-gray-700">Coût total par an</span>
-                    <span className="font-bold text-gray-900">1.08%</span>
+                  <div className="flex justify-between items-center bg-blue-50 p-3 rounded-lg mt-4 hover:bg-blue-100 transition-colors duration-200 cursor-pointer transform hover:scale-105 group">
+                    <span className="font-medium text-blue-800">Coût total par an</span>
+                    <span className="font-bold text-blue-900 group-hover:scale-110 transition-transform duration-200">1.08%</span>
                   </div>
                 </div>
               </div>
@@ -357,35 +395,35 @@ export const KIDManager = () => {
               <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Informations clés</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">ISIN</p>
                     <p className="font-medium text-gray-900">XS1914695009</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Émetteur</p>
                     <p className="font-medium text-gray-900">BNP Paribas Issuance B.V.</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Garant</p>
                     <p className="font-medium text-gray-900">BNP Paribas S.A.</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Autorité compétente</p>
                     <p className="font-medium text-gray-900">AMF</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Date d'émission</p>
                     <p className="font-medium text-gray-900">03 Mai 2019</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Date d'échéance</p>
                     <p className="font-medium text-gray-900">03 Mai 2024</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Devise</p>
                     <p className="font-medium text-gray-900">EUR</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="bg-gray-50 p-3 rounded-lg hover:bg-white hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1">
                     <p className="text-sm text-gray-600">Montant nominal</p>
                     <p className="font-medium text-gray-900">1,000 EUR</p>
                   </div>
