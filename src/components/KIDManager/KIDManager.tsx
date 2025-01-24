@@ -323,77 +323,71 @@ export const KIDManager = () => {
               </div>
 
               {/* Coûts */}
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Répartition des coûts</h3>
-                <div className="relative w-full h-48">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 rounded-full border-8 border-blue-500 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-gray-800">1.08%</div>
-                        <div className="text-sm text-gray-600">Coût total par an</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-gray-600">Coûts d'entrée</span>
-                    <span className="font-medium">0.36%</span>
+                    <span className="font-medium text-gray-900">0.36%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-gray-600">Coûts de sortie</span>
-                    <span className="font-medium">0.50%</span>
+                    <span className="font-medium text-gray-900">0.50%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-gray-600">Coûts de transaction</span>
-                    <span className="font-medium">0.00%</span>
+                    <span className="font-medium text-gray-900">0.00%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-gray-600">Autres coûts récurrents</span>
-                    <span className="font-medium">0.00%</span>
+                    <span className="font-medium text-gray-900">0.00%</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center border-b pb-2">
                     <span className="text-gray-600">Commissions de performance</span>
-                    <span className="font-medium">0.00%</span>
+                    <span className="font-medium text-gray-900">0.00%</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 p-2 rounded-lg mt-4">
+                    <span className="font-medium text-gray-700">Coût total par an</span>
+                    <span className="font-bold text-gray-900">1.08%</span>
                   </div>
                 </div>
               </div>
 
-              {/* Informations supplémentaires */}
-              <div className="space-y-2">
+              {/* Informations clés */}
+              <div className="space-y-4">
                 <h3 className="font-medium text-gray-700">Informations clés</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">ISIN</p>
-                    <p className="font-medium">XS1914695009</p>
+                    <p className="font-medium text-gray-900">XS1914695009</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Émetteur</p>
-                    <p className="font-medium">BNP Paribas Issuance B.V.</p>
+                    <p className="font-medium text-gray-900">BNP Paribas Issuance B.V.</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Garant</p>
-                    <p className="font-medium">BNP Paribas S.A.</p>
+                    <p className="font-medium text-gray-900">BNP Paribas S.A.</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Autorité compétente</p>
-                    <p className="font-medium">AMF</p>
+                    <p className="font-medium text-gray-900">AMF</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Date d'émission</p>
-                    <p className="font-medium">03 Mai 2019</p>
+                    <p className="font-medium text-gray-900">03 Mai 2019</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Date d'échéance</p>
-                    <p className="font-medium">03 Mai 2024</p>
+                    <p className="font-medium text-gray-900">03 Mai 2024</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Devise</p>
-                    <p className="font-medium">EUR</p>
+                    <p className="font-medium text-gray-900">EUR</p>
                   </div>
-                  <div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
                     <p className="text-sm text-gray-600">Montant nominal</p>
-                    <p className="font-medium">1,000 EUR</p>
+                    <p className="font-medium text-gray-900">1,000 EUR</p>
                   </div>
                 </div>
               </div>
