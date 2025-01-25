@@ -1,6 +1,46 @@
 import React, { useState } from 'react';
 import { KID } from '../types';
 
+// Fonction pour exporter en CSV
+const exportToCSV = (kids: KID[]) => {
+  const headers = ['Nom', 'ISIN', 'Émetteur', 'Garant', 'Date d\'émission', 'Date de maturité', 'Devise', 'Montant nominal'];
+  const rows = kids.map(kid => [
+    kid.name,
+    kid.keyInfo.isin,
+    kid.keyInfo.issuer,
+    kid.keyInfo.guarantor,
+    kid.keyInfo.issueDate,
+    kid.keyInfo.maturityDate,
+    kid.keyInfo.currency,
+    kid.keyInfo.nominalAmount
+  ]);
+  
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', 'kids_export.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+// Fonction pour exporter en JSON
+const exportToJSON = (kids: KID[]) => {
+  const jsonContent = JSON.stringify(kids, null, 2);
+  const blob = new Blob([jsonContent], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', 'kids_export.json');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 interface KIDExplorerProps {
   kids: KID[];
   onClose: () => void;
@@ -26,14 +66,28 @@ const KIDExplorer: React.FC<KIDExplorerProps> = ({ kids, onClose }) => {
           </button>
         </div>
 
-        <div className="mb-6">
+        <div className="flex justify-between items-center mb-6">
           <input
             type="text"
             placeholder="Rechercher par nom..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full max-w-md p-2 border border-gray-300 rounded-lg mr-4"
           />
+          <div className="flex space-x-2">
+            <button
+              onClick={() => exportToCSV(filteredKids)}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+            >
+              Exporter CSV
+            </button>
+            <button
+              onClick={() => exportToJSON(filteredKids)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Exporter JSON
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
