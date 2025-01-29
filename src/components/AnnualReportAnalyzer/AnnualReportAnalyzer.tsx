@@ -23,18 +23,61 @@ const AnnualReportAnalyzer: React.FC = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
 
+  // Questions prédéfinies et leurs réponses
+  const predefinedQA = [
+    {
+      question: "Quel est le résultat net du groupe ?",
+      answer: "Le résultat net part du groupe s'élève à 2 868 M€ au troisième trimestre 2024, en hausse de +5,9% par rapport au T3 2023. Cette performance démontre la solidité du modèle d'affaires diversifié du groupe."
+    },
+    {
+      question: "Comment se portent les activités de CIB ?",
+      answer: "Le PNB de Corporate & Institutional Banking (CIB) est en forte progression (+9,0% / 3T23). Cette croissance est portée notamment par les activités de Capital Markets en EMEA (+12,4%), l'Advisory en EMEA et les activités de Transaction Banking en Amériques et APAC."
+    },
+    {
+      question: "Quelle est la structure financière du groupe ?",
+      answer: "La structure financière est très solide avec un ratio CET1 de 12,7% au 30 septembre 2024. La consolidation prudentielle d'Arval (30 pb) au 3T24 a été effectuée, avec des titrisations prévues au 4T24."
+    },
+    {
+      question: "Quels sont les coûts du risque ?",
+      answer: "Le coût du risque est stable à 32 points de base, démontrant une gestion prudente des risques dans un contexte économique changeant."
+    },
+    {
+      question: "Quelles sont les perspectives pour 2024 ?",
+      answer: "BNP Paribas confirme sa trajectoire 2024 avec des revenus en croissance de plus de 2% par rapport à 2023 (46,9 Md€), un effet de ciseaux positif, un coût du risque inférieur à 40 pb et un résultat net part du groupe supérieur au résultat net distribuable 2023 (11,2 Md€)."
+    }
+  ];
+
+  // Suggestions de questions rapides
+  const quickQuestions = [
+    "Quel est le résultat net du groupe ?",
+    "Comment se portent les activités de CIB ?",
+    "Quelle est la structure financière du groupe ?",
+    "Quels sont les coûts du risque ?",
+    "Quelles sont les perspectives pour 2024 ?"
+  ];
+
   const handleSendMessage = () => {
     if (inputMessage.trim() === '') return;
 
     // Ajouter le message de l'utilisateur
     setMessages(prev => [...prev, { text: inputMessage, isUser: true }]);
 
-    // Simuler une réponse du chatbot
+    // Rechercher une réponse prédéfinie
+    const matchingQA = predefinedQA.find(qa => 
+      qa.question.toLowerCase().includes(inputMessage.toLowerCase()) ||
+      inputMessage.toLowerCase().includes(qa.question.toLowerCase())
+    );
+
     setTimeout(() => {
-      let response = "Je suis désolé, mais je ne peux pas analyser le document sans qu'un rapport soit sélectionné.";
-      
-      if (selectedReport) {
-        response = `J'ai analysé le rapport "${selectedReport.name}". Que souhaitez-vous savoir à son sujet ?`;
+      let response;
+      if (!selectedReport) {
+        response = "Je suis désolé, mais je ne peux pas analyser le document sans qu'un rapport soit sélectionné.";
+      } else if (matchingQA) {
+        response = matchingQA.answer;
+      } else {
+        response = `Je ne trouve pas de réponse spécifique à votre question. Voici les questions auxquelles je peux répondre concernant le rapport "${selectedReport.name}" :
+        
+${quickQuestions.map(q => `- ${q}`).join('\n')}`;
       }
 
       setMessages(prev => [...prev, { text: response, isUser: false }]);
@@ -242,6 +285,24 @@ const AnnualReportAnalyzer: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* Questions rapides */}
+          {selectedReport && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {quickQuestions.map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setInputMessage(question);
+                    handleSendMessage();
+                  }}
+                  className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full transition-colors"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Zone de saisie */}
           <div className="flex items-center space-x-2">
