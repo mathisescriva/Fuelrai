@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { MainLayout } from './layouts/MainLayout'
 import { KIDManager } from './components/KIDManager/KIDManager'
 import { Home } from './components/Home/Home'
+import AnnualReportAnalyzer from './components/AnnualReportAnalyzer/AnnualReportAnalyzer'
 
 function App() {
   return (
@@ -15,10 +16,7 @@ function App() {
         } />
         <Route path="/annual-reports" element={
           <MainLayout>
-            <div className="p-4">
-              <h1 className="text-2xl font-bold">Analyseur de rapports annuels</h1>
-              <p className="mt-4">Cette fonctionnalité sera bientôt disponible.</p>
-            </div>
+            <AnnualReportAnalyzer />
           </MainLayout>
         } />
       </Routes>
