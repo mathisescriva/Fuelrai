@@ -1,41 +1,27 @@
 import React, { useState } from 'react';
 import { KID } from '../types';
 
-// Fonction pour exporter en CSV
-const exportToCSV = (kids: KID[]) => {
-  const headers = ['Nom', 'ISIN', 'Émetteur', 'Garant', 'Date d\'émission', 'Date de maturité', 'Devise', 'Montant nominal'];
-  const rows = kids.map(kid => [
-    kid.name,
-    kid.keyInfo.isin,
-    kid.keyInfo.issuer,
-    kid.keyInfo.guarantor,
-    kid.keyInfo.issueDate,
-    kid.keyInfo.maturityDate,
-    kid.keyInfo.currency,
-    kid.keyInfo.nominalAmount
-  ]);
-  
-  const csvContent = [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', 'kids_export.csv');
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+// Fonction pour exporter au format RAG-Ready
+const exportToRAGFormat = (kids: KID[]) => {
+  const ragReadyData = kids.map(kid => ({
+    title: kid.name,
+    metadata: {
+      isin: kid.keyInfo.isin,
+      issuer: kid.keyInfo.issuer,
+      guarantor: kid.keyInfo.guarantor,
+      issueDate: kid.keyInfo.issueDate,
+      maturityDate: kid.keyInfo.maturityDate,
+      currency: kid.keyInfo.currency,
+      nominalAmount: kid.keyInfo.nominalAmount
+    },
+    content: JSON.stringify(kid) // Inclut toutes les données pour le traitement RAG
+  }));
 
-// Fonction pour exporter en JSON
-const exportToJSON = (kids: KID[]) => {
-  const jsonContent = JSON.stringify(kids, null, 2);
+  const jsonContent = JSON.stringify(ragReadyData, null, 2);
   const blob = new Blob([jsonContent], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', 'kids_export.json');
+  link.setAttribute('download', 'kids_rag_ready.json');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -76,16 +62,10 @@ const KIDExplorer: React.FC<KIDExplorerProps> = ({ kids, onClose }) => {
           />
           <div className="flex space-x-2">
             <button
-              onClick={() => exportToCSV(filteredKids)}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+              onClick={() => exportToRAGFormat(filteredKids)}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
             >
-              Exporter CSV
-            </button>
-            <button
-              onClick={() => exportToJSON(filteredKids)}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Exporter JSON
+              Convertir au format RAG
             </button>
           </div>
         </div>

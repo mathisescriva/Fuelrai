@@ -26,10 +26,34 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
   const [kids, setKids] = useState<KID[]>([]);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [showKIDExplorer, setShowKIDExplorer] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStep, setProcessingStep] = useState(0);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const processingSteps = [
+    "Analyse de la structure du document...",
+    "Extraction des tableaux et données numériques...",
+    "Identification des sections clés...",
+    "Extraction du contexte et des relations...",
+    "Traitement des images et graphiques...",
+    "Conversion au format exploitable...",
+    "Finalisation de l'intégration..."
+  ];
+
+  const simulateProcessing = async () => {
+    setIsProcessing(true);
+    for (let i = 0; i < processingSteps.length; i++) {
+      setProcessingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+    }
+    setIsProcessing(false);
+    setProcessingStep(0);
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
+      await simulateProcessing();
+      
       // Limiter à 5 fichiers maximum
       const newFiles = Array.from(files).slice(0, 5 - kids.length);
       
@@ -118,6 +142,23 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
 
   return (
     <div className="p-6">
+      {isProcessing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+              <p className="text-lg font-semibold mb-2">Traitement en cours</p>
+              <p className="text-gray-600 text-center">{processingSteps[processingStep]}</p>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
+                <div 
+                  className="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${(processingStep + 1) * (100 / processingSteps.length)}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Section upload */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -132,7 +173,12 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
               </button>
             )}
           </div>
-          <label className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200">
+          <label className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 relative">
+            {isProcessing && (
+              <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
+              </div>
+            )}
             <input
               type="file"
               accept=".pdf"
