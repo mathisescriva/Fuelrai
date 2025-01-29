@@ -30,20 +30,70 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
   const [processingStep, setProcessingStep] = useState(0);
 
   const processingSteps = [
-    "Analyse de la structure du document...",
-    "Extraction des tableaux et données numériques...",
-    "Identification des sections clés...",
-    "Extraction du contexte et des relations...",
-    "Traitement des images et graphiques...",
-    "Conversion au format exploitable...",
-    "Finalisation de l'intégration..."
+    {
+      message: "Analyse de la structure du document...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    },
+    {
+      message: "Extraction des tableaux et données numériques...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3zm0 5h16" />
+        </svg>
+      )
+    },
+    {
+      message: "Identification des sections clés...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      )
+    },
+    {
+      message: "Extraction du contexte et des relations...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-ping" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      )
+    },
+    {
+      message: "Traitement des images et graphiques...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    {
+      message: "Conversion au format exploitable...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      )
+    },
+    {
+      message: "Finalisation de l'intégration...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    }
   ];
 
   const simulateProcessing = async () => {
     setIsProcessing(true);
     for (let i = 0; i < processingSteps.length; i++) {
       setProcessingStep(i);
-      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 700));
+      // Temps d'attente plus long pour chaque étape (entre 1.5s et 2.5s)
+      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
     }
     setIsProcessing(false);
     setProcessingStep(0);
@@ -54,45 +104,53 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
     if (files && files.length > 0) {
       await simulateProcessing();
       
-      // Limiter à 5 fichiers maximum
-      const newFiles = Array.from(files).slice(0, 5 - kids.length);
-      
-      const newKids: KID[] = newFiles.map((file, index) => ({
-        id: Date.now() + index,
-        name: file.name,
-        url: URL.createObjectURL(file),
-        file,
-        costs: [
-          { label: "Coûts d'entrée", value: 0.36 },
-          { label: "Coûts de sortie", value: 0.50 },
-          { label: "Coûts de transaction", value: 0.00 },
-          { label: "Autres coûts récurrents", value: 0.00 },
-          { label: "Commissions de performance", value: 0.00 }
-        ],
-        keyInfo: {
-          isin: "XS1914695009",
-          issuer: "BNP Paribas Issuance B.V.",
-          guarantor: "BNP Paribas S.A.",
-          authority: "AMF",
-          issueDate: "03 Mai 2019",
-          maturityDate: "03 Mai 2024",
-          currency: "EUR",
-          nominalAmount: "1,000 EUR"
-        }
-      }));
-
-      setKids(prevKids => {
-        // Révoquer les anciennes URLs avant de les remplacer
-        prevKids.forEach(kid => {
-          if (kid.url.startsWith('blob:')) {
-            URL.revokeObjectURL(kid.url);
+      try {
+        // Limiter à 5 fichiers maximum
+        const newFiles = Array.from(files).slice(0, 5 - kids.length);
+        
+        const newKids: KID[] = newFiles.map((file, index) => ({
+          id: Date.now() + index,
+          name: file.name,
+          url: URL.createObjectURL(file),
+          file,
+          costs: [
+            { label: "Coûts d'entrée", value: 0.36 },
+            { label: "Coûts de sortie", value: 0.50 },
+            { label: "Coûts de transaction", value: 0.00 },
+            { label: "Autres coûts récurrents", value: 0.00 },
+            { label: "Commissions de performance", value: 0.00 }
+          ],
+          keyInfo: {
+            isin: "XS1914695009",
+            issuer: "BNP Paribas Issuance B.V.",
+            guarantor: "BNP Paribas S.A.",
+            authority: "AMF",
+            issueDate: "03 Mai 2019",
+            maturityDate: "03 Mai 2024",
+            currency: "EUR",
+            nominalAmount: "1,000 EUR"
           }
-        });
-        return [...prevKids, ...newKids];
-      });
+        }));
 
-      if (onUpload) {
-        onUpload(files);
+        setKids(prevKids => {
+          // Révoquer les anciennes URLs avant de les remplacer
+          prevKids.forEach(kid => {
+            if (kid.url.startsWith('blob:')) {
+              URL.revokeObjectURL(kid.url);
+            }
+          });
+          return [...prevKids, ...newKids];
+        });
+
+        if (onUpload) {
+          onUpload(files);
+        }
+
+        // Réinitialiser les erreurs si le chargement réussit
+        setPdfError('');
+      } catch (error) {
+        console.error('Erreur lors du chargement des fichiers:', error);
+        setPdfError('Erreur lors du chargement des fichiers. Veuillez réessayer.');
       }
     }
   };
@@ -123,11 +181,12 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setPdfError(''); // Réinitialiser l'erreur en cas de succès
   };
 
   const onDocumentLoadError = (error: Error) => {
-    setPdfError('Erreur lors du chargement du PDF. Veuillez réessayer.');
     console.error('Erreur PDF:', error);
+    setPdfError('Erreur lors du chargement du PDF. Veuillez vérifier que le fichier est un PDF valide.');
   };
 
   useEffect(() => {
@@ -146,9 +205,11 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mb-4"></div>
+              <div className="mb-4">
+                {processingSteps[processingStep].icon}
+              </div>
               <p className="text-lg font-semibold mb-2">Traitement en cours</p>
-              <p className="text-gray-600 text-center">{processingSteps[processingStep]}</p>
+              <p className="text-gray-600 text-center">{processingSteps[processingStep].message}</p>
               <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                 <div 
                   className="bg-purple-500 h-2 rounded-full transition-all duration-500"
@@ -291,6 +352,11 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                           </div>
                         }
+                        options={{
+                          cMapUrl: 'cmaps/',
+                          cMapPacked: true,
+                          standardFontDataUrl: 'standard_fonts/'
+                        }}
                       >
                         <Page
                           pageNumber={pageNumber}
@@ -432,13 +498,18 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                         onLoadError={(error) => {
                           console.error('Erreur PDF:', error);
-                          setPdfError('Erreur lors du chargement du PDF. Veuillez réessayer.');
+                          setPdfError('Erreur lors du chargement du PDF. Veuillez vérifier que le fichier est un PDF valide.');
                         }}
                         loading={
                           <div className="flex items-center justify-center p-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                           </div>
                         }
+                        options={{
+                          cMapUrl: 'cmaps/',
+                          cMapPacked: true,
+                          standardFontDataUrl: 'standard_fonts/'
+                        }}
                       >
                         <Page
                           pageNumber={pageNumber}
