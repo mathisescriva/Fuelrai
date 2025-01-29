@@ -17,6 +17,39 @@ const AnnualReportAnalyzer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentReportIndex, setCurrentReportIndex] = useState(0);
 
+  // États pour le chatbot
+  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([
+    { text: "Bonjour ! Je suis votre assistant d'analyse de rapports annuels. Comment puis-je vous aider ?", isUser: false }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+
+  const handleSendMessage = () => {
+    if (inputMessage.trim() === '') return;
+
+    // Ajouter le message de l'utilisateur
+    setMessages(prev => [...prev, { text: inputMessage, isUser: true }]);
+
+    // Simuler une réponse du chatbot
+    setTimeout(() => {
+      let response = "Je suis désolé, mais je ne peux pas analyser le document sans qu'un rapport soit sélectionné.";
+      
+      if (selectedReport) {
+        response = `J'ai analysé le rapport "${selectedReport.name}". Que souhaitez-vous savoir à son sujet ?`;
+      }
+
+      setMessages(prev => [...prev, { text: response, isUser: false }]);
+    }, 1000);
+
+    setInputMessage('');
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   const filteredReports = reports.filter(report =>
     report.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -186,77 +219,48 @@ const AnnualReportAnalyzer: React.FC = () => {
           )}
         </div>
 
-        {/* Colonne de droite - Analyse */}
-        <div>
-          {selectedReport ? (
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-medium">Analyse du Rapport</h3>
-              </div>
-
-              {/* Métriques Financières */}
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Métriques Clés</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Chiffre d'affaires</p>
-                      <p className="text-lg font-medium">
-                        {selectedReport.financialMetrics.revenue.toLocaleString()} €
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Résultat d'exploitation</p>
-                      <p className="text-lg font-medium">
-                        {selectedReport.financialMetrics.operatingIncome.toLocaleString()} €
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Résultat net</p>
-                      <p className="text-lg font-medium">
-                        {selectedReport.financialMetrics.netIncome.toLocaleString()} €
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">BPA</p>
-                      <p className="text-lg font-medium">
-                        {selectedReport.financialMetrics.eps.toFixed(2)} €
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Informations de l'entreprise */}
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Informations de l'entreprise</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600">Nom</p>
-                      <p className="text-base font-medium">{selectedReport.companyInfo.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Secteur</p>
-                      <p className="text-base font-medium">{selectedReport.companyInfo.sector}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Symbole</p>
-                      <p className="text-base font-medium">{selectedReport.companyInfo.stockSymbol}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Année fiscale</p>
-                      <p className="text-base font-medium">{selectedReport.companyInfo.fiscalYear}</p>
-                    </div>
-                  </div>
+        {/* Colonne de droite - Chatbot */}
+        <div className="bg-white rounded-lg shadow p-6 flex flex-col h-[calc(100vh-12rem)]">
+          <h3 className="text-lg font-medium mb-4">Assistant d'Analyse</h3>
+          
+          {/* Zone des messages */}
+          <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.isUser
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {message.text}
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow p-6 text-center">
-              <p className="text-gray-500">
-                Sélectionnez un rapport pour voir l'analyse détaillée
-              </p>
-            </div>
-          )}
+            ))}
+          </div>
+
+          {/* Zone de saisie */}
+          <div className="flex items-center space-x-2">
+            <textarea
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Posez une question sur le rapport..."
+              className="flex-1 border rounded-lg p-2 resize-none h-[50px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleSendMessage}
+              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
