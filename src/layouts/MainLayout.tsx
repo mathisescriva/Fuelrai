@@ -8,7 +8,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Header */}
       <header className="w-full bg-white shadow">
         <div className="w-full px-8 py-4">
-          <h1 className="text-3xl font-bold text-gray-900">Finance Document Analysis</h1>
+          <img src="/images/logo.png" alt="Elixir Logo" className="h-8 w-auto" />
         </div>
       </header>
 

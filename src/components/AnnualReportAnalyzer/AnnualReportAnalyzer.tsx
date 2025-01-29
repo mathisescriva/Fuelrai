@@ -63,19 +63,6 @@ const AnnualReportAnalyzer: React.FC = () => {
     setPdfError('');
   };
 
-  const onDocumentLoadError = (error: Error) => {
-    setPdfError('Erreur lors du chargement du PDF');
-    console.error('Erreur PDF:', error);
-  };
-
-  const handleNextPage = () => {
-    setPageNumber(prev => Math.min(prev + 1, numPages));
-  };
-
-  const handlePrevPage = () => {
-    setPageNumber(prev => Math.max(prev - 1, 1));
-  };
-
   const handleBrowseReports = () => {
     setIsModalOpen(true);
     setCurrentReportIndex(reports.findIndex(r => r.id === selectedReport?.id) || 0);
@@ -92,7 +79,7 @@ const AnnualReportAnalyzer: React.FC = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold mb-6 text-black">Gestionnaire de Rapports Annuels</h2>
+        <h2 className="text-2xl font-bold text-black">Gestionnaire de Rapports Annuels</h2>
         <button
           onClick={() => document.getElementById('file-upload')?.click()}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -111,13 +98,9 @@ const AnnualReportAnalyzer: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Colonne de gauche */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">Documents Annuels</h3>
-          </div>
-
+        <div className="space-y-4">
           {/* En-tête avec le bouton parcourir */}
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end">
             <button 
               className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
               onClick={handleBrowseReports}
@@ -127,7 +110,7 @@ const AnnualReportAnalyzer: React.FC = () => {
           </div>
 
           {/* Liste des documents */}
-          <div className="bg-white rounded-lg shadow p-6 mb-4">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center mb-4">
               <h3 className="text-lg font-medium">Documents Annuels</h3>
             </div>
@@ -157,14 +140,14 @@ const AnnualReportAnalyzer: React.FC = () => {
             </div>
           </div>
 
-          {/* Prévisualisation dans une box séparée */}
+          {/* Prévisualisation */}
           {selectedReport && (
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">Prévisualisation</h3>
+                <h3 className="text-lg font-medium text-black">Prévisualisation</h3>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={handlePrevPage}
+                    onClick={() => setPageNumber(prev => Math.max(prev - 1, 1))}
                     disabled={pageNumber <= 1}
                     className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
                   >
@@ -172,11 +155,11 @@ const AnnualReportAnalyzer: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
-                  <span className="text-sm">
+                  <span className="text-sm text-black">
                     Page {pageNumber} sur {numPages}
                   </span>
                   <button
-                    onClick={handleNextPage}
+                    onClick={() => setPageNumber(prev => Math.min(prev + 1, numPages))}
                     disabled={pageNumber >= numPages}
                     className="p-1 rounded hover:bg-gray-100 disabled:opacity-50"
                   >
@@ -187,22 +170,15 @@ const AnnualReportAnalyzer: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-center">
-                <div className="border rounded-lg overflow-hidden h-[600px] w-[400px]">
+                <div className="border rounded-lg overflow-hidden">
                   <Document
-                    file={selectedReport.url}
+                    file={selectedReport.file}
                     onLoadSuccess={onDocumentLoadSuccess}
-                    onLoadError={onDocumentLoadError}
                   >
-                    {pdfError ? (
-                      <div className="p-4 text-red-500">{pdfError}</div>
-                    ) : (
-                      <Page
-                        pageNumber={pageNumber}
-                        width={400}
-                        height={550}
-                        className="mx-auto"
-                      />
-                    )}
+                    <Page
+                      pageNumber={pageNumber}
+                      className="mx-auto"
+                    />
                   </Document>
                 </div>
               </div>
@@ -210,136 +186,70 @@ const AnnualReportAnalyzer: React.FC = () => {
           )}
         </div>
 
-        {/* Modal de parcours des rapports */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-medium">Parcourir les Rapports</h3>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+        {/* Colonne de droite - Analyse */}
+        <div>
+          {selectedReport ? (
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-medium">Analyse du Rapport</h3>
               </div>
 
-              {/* Contenu du rapport actuel */}
-              <div className="border rounded-lg p-4 mb-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
-                    </svg>
+              {/* Métriques Financières */}
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Métriques Clés</h4>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h4 className="text-lg font-medium text-black">{reports[currentReportIndex]?.name}</h4>
-                      <p className="text-sm text-gray-500">PDF Document</p>
+                      <p className="text-sm text-gray-600">Chiffre d'affaires</p>
+                      <p className="text-lg font-medium">
+                        {selectedReport.financialMetrics.revenue.toLocaleString()} €
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Résultat d'exploitation</p>
+                      <p className="text-lg font-medium">
+                        {selectedReport.financialMetrics.operatingIncome.toLocaleString()} €
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Résultat net</p>
+                      <p className="text-lg font-medium">
+                        {selectedReport.financialMetrics.netIncome.toLocaleString()} €
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">BPA</p>
+                      <p className="text-lg font-medium">
+                        {selectedReport.financialMetrics.eps.toFixed(2)} €
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Informations principales */}
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm"><span className="font-medium">Date de création:</span> {new Date().toLocaleDateString()}</p>
-                  <p className="text-sm"><span className="font-medium">Taille:</span> 2.5 MB</p>
-                  <p className="text-sm"><span className="font-medium">Nombre de pages:</span> {numPages}</p>
+                {/* Informations de l'entreprise */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Informations de l'entreprise</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-600">Nom</p>
+                      <p className="text-base font-medium">{selectedReport.companyInfo.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Secteur</p>
+                      <p className="text-base font-medium">{selectedReport.companyInfo.sector}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Symbole</p>
+                      <p className="text-base font-medium">{selectedReport.companyInfo.stockSymbol}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Année fiscale</p>
+                      <p className="text-base font-medium">{selectedReport.companyInfo.fiscalYear}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Navigation entre les rapports */}
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={handlePrevReport}
-                  className="p-2 rounded-full hover:bg-gray-100"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <span className="text-sm text-gray-500">
-                  Rapport {currentReportIndex + 1} sur {reports.length}
-                </span>
-                <button
-                  onClick={handleNextReport}
-                  className="p-2 rounded-full hover:bg-gray-100"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Colonne de droite */}
-        <div className="space-y-6">
-          {selectedReport ? (
-            <>
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-medium">Analyse du Rapport</h3>
-                </div>
-
-                {/* Métriques Financières */}
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 mb-2">Métriques Clés</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-600">Chiffre d'affaires</p>
-                        <p className="text-lg font-medium">
-                          {selectedReport.financialMetrics.revenue.toLocaleString()} €
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Résultat d'exploitation</p>
-                        <p className="text-lg font-medium">
-                          {selectedReport.financialMetrics.operatingIncome.toLocaleString()} €
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Résultat net</p>
-                        <p className="text-lg font-medium">
-                          {selectedReport.financialMetrics.netIncome.toLocaleString()} €
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">BPA</p>
-                        <p className="text-lg font-medium">
-                          {selectedReport.financialMetrics.eps.toFixed(2)} €
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Informations de l'entreprise */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 mb-2">Informations de l'entreprise</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-600">Nom</p>
-                        <p className="text-base font-medium">{selectedReport.companyInfo.name}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Secteur</p>
-                        <p className="text-base font-medium">{selectedReport.companyInfo.sector}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Symbole</p>
-                        <p className="text-base font-medium">{selectedReport.companyInfo.stockSymbol}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Année fiscale</p>
-                        <p className="text-base font-medium">{selectedReport.companyInfo.fiscalYear}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
           ) : (
             <div className="bg-white rounded-lg shadow p-6 text-center">
               <p className="text-gray-500">
@@ -349,6 +259,70 @@ const AnnualReportAnalyzer: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de parcours des rapports */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-medium">Parcourir les Rapports</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Contenu du rapport actuel */}
+            <div className="border rounded-lg p-4 mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z" />
+                  </svg>
+                  <div>
+                    <h4 className="text-lg font-medium text-black">{reports[currentReportIndex]?.name}</h4>
+                    <p className="text-sm text-gray-500">PDF Document</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations principales */}
+              <div className="space-y-2 mb-4">
+                <p className="text-sm"><span className="font-medium">Date de création:</span> {new Date().toLocaleDateString()}</p>
+                <p className="text-sm"><span className="font-medium">Taille:</span> 2.5 MB</p>
+                <p className="text-sm"><span className="font-medium">Nombre de pages:</span> {numPages}</p>
+              </div>
+            </div>
+
+            {/* Navigation entre les rapports */}
+            <div className="flex justify-between items-center">
+              <button
+                onClick={handlePrevReport}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <span className="text-sm text-gray-500">
+                Rapport {currentReportIndex + 1} sur {reports.length}
+              </span>
+              <button
+                onClick={handleNextReport}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
