@@ -24,6 +24,12 @@ const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
     { label: 'Devise', value: info.productDetails.currency },
     { label: 'Période de détention recommandée', value: info.redemptionInformation.recommendedHoldingPeriod },
     { label: 'Rachat anticipé', value: info.redemptionInformation.earlyRedemptionPossible ? 'Possible' : 'Non possible' },
+    
+    // Risque
+    { label: 'Indicateur de risque', 
+      value: `${info.risks.riskIndicator} sur ${info.risks.sriScale.highest} (${info.risks.riskIndicator === '1' ? 'Risque le plus faible' : 
+             info.risks.riskIndicator === '7' ? 'Risque le plus élevé' : 'Risque intermédiaire'})` 
+    },
   ];
 
   return (

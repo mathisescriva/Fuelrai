@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend, LineChart, Line
+  ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area
 } from 'recharts';
 import { KID } from '../types';
 
@@ -71,50 +71,95 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   return (
     <div className="space-y-6">
-      {/* Analyse de la dispersion des performances */}
+      {/* Graphique de comparaison des scénarios */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Évolution et Dispersion des Performances</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Comparaison des Scénarios</h3>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={timeEvolution}>
+            <AreaChart data={[
+              { période: '1 an', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['1 an']])) },
+              { période: '5 ans', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['5 ans']])) }
+            ]}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="période" />
               <YAxis tickFormatter={(value) => `${value}%`} />
               <Tooltip formatter={(value) => `${value}%`} />
               <Legend />
-              <Line 
+              <Area 
                 type="monotone" 
-                dataKey="Écart favorable/défavorable" 
-                stroke="#82ca9d" 
-                name="Dispersion des scénarios"
+                dataKey="Favorable" 
+                stackId="1"
+                stroke="#4ade80" 
+                fill="#4ade8020"
               />
-              <Line 
+              <Area 
                 type="monotone" 
-                dataKey="Potentiel de perte" 
-                stroke="#ff7676" 
-                name="Risque maximal"
+                dataKey="Intermediaire" 
+                stackId="2"
+                stroke="#60a5fa" 
+                fill="#60a5fa20"
               />
-              <Line 
+              <Area 
                 type="monotone" 
-                dataKey="Performance moyenne" 
-                stroke="#8884d8" 
-                name="Scénario moyen"
+                dataKey="Defavorable" 
+                stackId="3"
+                stroke="#f97316" 
+                fill="#f9731620"
               />
-            </LineChart>
+              <Area 
+                type="monotone" 
+                dataKey="Tensions" 
+                stackId="4"
+                stroke="#ef4444" 
+                fill="#ef444420"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">Dispersion maximale à 5 ans</p>
-            <p className="font-semibold text-gray-900">
-              {(performanceScenarios[3]['5 ans'] - performanceScenarios[1]['5 ans']).toFixed(1)}%
-            </p>
+      </div>
+
+      {/* Graphiques individuels des scénarios */}
+      <div className="grid grid-cols-2 gap-6">
+        {performanceScenarios.map((scenario) => (
+          <div key={scenario.scenario} className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Scénario {scenario.scenario}
+            </h3>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={[
+                  { période: '1 an', performance: scenario['1 an'] },
+                  { période: '5 ans', performance: scenario['5 ans'] }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="période" />
+                  <YAxis tickFormatter={(value) => `${value}%`} />
+                  <Tooltip formatter={(value) => `${value}%`} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="performance" 
+                    stroke={scenario.scenario === 'Favorable' ? '#4ade80' :
+                           scenario.scenario === 'Intermediaire' ? '#60a5fa' :
+                           scenario.scenario === 'Defavorable' ? '#f97316' :
+                           '#ef4444'} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600">Performance à 1 an</p>
+                  <p className="font-semibold text-gray-900">{scenario['1 an']}%</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600">Performance à 5 ans</p>
+                  <p className="font-semibold text-gray-900">{scenario['5 ans']}%</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">Perte maximale (stress)</p>
-            <p className="font-semibold text-gray-900">{performanceScenarios[0]['1 an']}%</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Impact des coûts dans le temps */}
