@@ -1,22 +1,27 @@
 import React from 'react';
-
-interface Cost {
-  label: string;
-  value: number;
-}
+import { Costs } from '../types';
 
 interface CostBreakdownProps {
-  costs: Cost[];
+  costs: Costs;
 }
 
 const CostBreakdown: React.FC<CostBreakdownProps> = ({ costs }) => {
-  const totalCost = costs.reduce((acc, cost) => acc + cost.value, 0);
+  const { compositionOfCosts } = costs;
+  const costItems = [
+    { label: "Coûts d'entrée", value: compositionOfCosts.entryCosts / 100 },
+    { label: "Coûts de sortie", value: compositionOfCosts.exitCosts / 100 },
+    { label: "Coûts de transaction", value: compositionOfCosts.transactionCosts / 100 },
+    { label: "Coûts récurrents", value: compositionOfCosts.ongoingCosts / 100 },
+    { label: "Coûts accessoires", value: compositionOfCosts.incidentalCosts / 100 }
+  ];
+
+  const totalCost = costItems.reduce((acc, cost) => acc + cost.value, 0);
 
   return (
     <div className="space-y-4">
       <h3 className="font-medium text-gray-700">Répartition des coûts</h3>
       <div className="space-y-2">
-        {costs.map((cost) => (
+        {costItems.map((cost) => (
           <div
             key={cost.label}
             className="flex justify-between items-center border-b pb-2 hover:bg-gray-50 transition-all duration-200 p-2 rounded-lg cursor-pointer group"

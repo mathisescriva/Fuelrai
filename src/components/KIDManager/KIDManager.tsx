@@ -108,28 +108,79 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
         // Limiter à 5 fichiers maximum
         const newFiles = Array.from(files).slice(0, 5 - kids.length);
         
+        const kidData = {
+          documentTitle: "Informations clés sur le produit Magna New Frontiers Fund – R Class Shares",
+          documentLanguage: "en",
+          documentDate: "19 janvier 2024",
+          manufacturerName: "Fiera Capital (UK) Limited",
+          productDetails: {
+            productName: "Magna New Frontiers Fund – R Class Shares",
+            productType: "OPCVM",
+            isin: "IE00B68FF474",
+            currency: "EUR"
+          },
+          risks: {
+            riskIndicator: "4",
+            sriScale: {
+              lowest: 1,
+              highest: 7,
+              current: 4
+            }
+          },
+          performanceScenarios: {
+            initialInvestment: 10000,
+            scenarios: [
+              {
+                scenarioName: "Tensions",
+                periods: [
+                  { holdingPeriod: "1 an", finalAmount: 870, performance: "-91.3" },
+                  { holdingPeriod: "5 ans", finalAmount: 800, performance: "-39.65" }
+                ]
+              },
+              {
+                scenarioName: "Defavorable",
+                periods: [
+                  { holdingPeriod: "1 an", finalAmount: 6240, performance: "-37.58" },
+                  { holdingPeriod: "5 ans", finalAmount: 8740, performance: "-2.67" }
+                ]
+              },
+              {
+                scenarioName: "Intermediaire",
+                periods: [
+                  { holdingPeriod: "1 an", finalAmount: 10380, performance: "3.83" },
+                  { holdingPeriod: "5 ans", finalAmount: 14520, performance: "7.74" }
+                ]
+              },
+              {
+                scenarioName: "Favorable",
+                periods: [
+                  { holdingPeriod: "1 an", finalAmount: 17010, performance: "70.09" },
+                  { holdingPeriod: "5 ans", finalAmount: 17350, performance: "11.64" }
+                ]
+              }
+            ]
+          },
+          costs: {
+            compositionOfCosts: {
+              entryCosts: 500,
+              exitCosts: 0,
+              ongoingCosts: 291,
+              transactionCosts: 0,
+              incidentalCosts: 211
+            }
+          },
+          redemptionInformation: {
+            recommendedHoldingPeriod: "5 ans",
+            earlyRedemptionPossible: true
+          }
+        };
+
         const newKids: KID[] = newFiles.map((file, index) => ({
           id: Date.now() + index,
           name: file.name,
           url: URL.createObjectURL(file),
           file,
-          costs: [
-            { label: "Coûts d'entrée", value: 0.36 },
-            { label: "Coûts de sortie", value: 0.50 },
-            { label: "Coûts de transaction", value: 0.00 },
-            { label: "Autres coûts récurrents", value: 0.00 },
-            { label: "Commissions de performance", value: 0.00 }
-          ],
-          keyInfo: {
-            isin: "XS1914695009",
-            issuer: "BNP Paribas Issuance B.V.",
-            guarantor: "BNP Paribas S.A.",
-            authority: "AMF",
-            issueDate: "03 Mai 2019",
-            maturityDate: "03 Mai 2024",
-            currency: "EUR",
-            nominalAmount: "1,000 EUR"
-          }
+          ...kidData
         }));
 
         setKids(prevKids => {
@@ -390,9 +441,9 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                       <div key={kid.id}>
                         <h3 className="font-medium text-gray-800 mb-4">Document {index + 1}</h3>
                         <div className="space-y-6">
-                          <RiskLevel level={index === 0 ? 3 : 4} />
+                          <RiskLevel level={parseInt(kid.risks.riskIndicator)} />
                           <CostBreakdown costs={kid.costs} />
-                          <KeyInformation info={kid.keyInfo} />
+                          <KeyInformation info={kid} />
                         </div>
                       </div>
                     ))}
@@ -551,9 +602,9 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                   <AdvancedAnalytics selectedKids={[selectedKid]} />
                 ) : (
                   <>
-                    <RiskLevel level={3} />
+                    <RiskLevel level={parseInt(selectedKid.risks.riskIndicator)} />
                     <CostBreakdown costs={selectedKid.costs} />
-                    <KeyInformation info={selectedKid.keyInfo} />
+                    <KeyInformation info={selectedKid} />
                   </>
                 )}
               </div>

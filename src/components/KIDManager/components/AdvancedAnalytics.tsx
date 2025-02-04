@@ -10,41 +10,62 @@ interface AdvancedAnalyticsProps {
 }
 
 const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) => {
-  // Données des scénarios de performance
-  const performanceScenarios = [
-    { scenario: 'Scénario de tensions', '1 an': -30, '3 ans': -10, '5 ans': -5 },
-    { scenario: 'Scénario défavorable', '1 an': -10, '3 ans': -5, '5 ans': 0 },
-    { scenario: 'Scénario intermédiaire', '1 an': 5, '3 ans': 15, '5 ans': 25 },
-    { scenario: 'Scénario favorable', '1 an': 20, '3 ans': 35, '5 ans': 50 }
-  ];
+  if (!selectedKids || selectedKids.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Veuillez sélectionner un KID pour voir l'analyse avancée
+      </div>
+    );
+  }
+
+  const kid = selectedKids[0]; // On prend le premier KID pour l'analyse
+  
+  // Transformation des scénarios de performance
+  const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
+    const oneYear = scenario.periods.find(p => p.holdingPeriod === '1 an');
+    const fiveYears = scenario.periods.find(p => p.holdingPeriod === '5 ans');
+    return {
+      scenario: scenario.scenarioName,
+      '1 an': parseFloat(oneYear?.performance || '0'),
+      '5 ans': parseFloat(fiveYears?.performance || '0')
+    };
+  });
 
   // Calcul de l'évolution des scénarios dans le temps
-  const timeEvolution = ['1 an', '3 ans', '5 ans'].map(period => ({
-    période: period,
-    'Écart favorable/défavorable': performanceScenarios[3][period] - performanceScenarios[1][period],
-    'Potentiel de perte': performanceScenarios[0][period],
-    'Performance moyenne': performanceScenarios[2][period]
-  }));
+  const timeEvolution = ['1 an', '5 ans'].map(period => {
+    const favorable = performanceScenarios.find(s => s.scenario === 'Favorable')?.[period] || 0;
+    const defavorable = performanceScenarios.find(s => s.scenario === 'Defavorable')?.[period] || 0;
+    const tensions = performanceScenarios.find(s => s.scenario === 'Tensions')?.[period] || 0;
+    const intermediaire = performanceScenarios.find(s => s.scenario === 'Intermediaire')?.[period] || 0;
 
-  // Analyse des coûts cumulés
+    return {
+      période: period,
+      'Écart favorable/défavorable': favorable - defavorable,
+      'Potentiel de perte': tensions,
+      'Performance moyenne': intermediaire
+    };
+  });
+
+  // Analyse des coûts
   const costs = {
-    entry: 2,
-    exit: 1,
-    management: 1.5,
-    transaction: 0.5,
-    performance: 1
+    entry: kid.costs.compositionOfCosts.entryCosts / 100,
+    exit: kid.costs.compositionOfCosts.exitCosts / 100,
+    ongoing: kid.costs.compositionOfCosts.ongoingCosts / 100,
+    transaction: kid.costs.compositionOfCosts.transactionCosts / 100,
+    incidental: kid.costs.compositionOfCosts.incidentalCosts / 100
   };
 
   const cumulativeCosts = Array.from({ length: 6 }, (_, i) => {
     const year = i;
     const entryExitAmortized = (costs.entry + costs.exit) / 5;
-    const recurring = costs.management + costs.transaction + costs.performance;
+    const recurring = costs.ongoing + costs.transaction + costs.incidental;
+    const annualCost = entryExitAmortized + recurring;
     return {
       année: year === 0 ? 'Initial' : `Année ${year}`,
-      coûts: year === 0 ? costs.entry : (entryExitAmortized + recurring).toFixed(2),
+      coûts: year === 0 ? costs.entry : annualCost.toFixed(2),
       coûtsCumulés: year === 0 
         ? costs.entry 
-        : (costs.entry + (entryExitAmortized + recurring) * year).toFixed(2)
+        : (costs.entry + annualCost * year).toFixed(2)
     };
   });
 
@@ -145,10 +166,14 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
           <div className="p-4 bg-blue-50 rounded-lg">
             <h4 className="font-medium text-blue-800 mb-2">Profil Rendement/Risque</h4>
             <p className="text-sm text-blue-600">
-              Le produit présente une dispersion de performance de{' '}
-              {(performanceScenarios[3]['5 ans'] - performanceScenarios[1]['5 ans']).toFixed(1)}% 
-              sur 5 ans, avec un scénario médian de {performanceScenarios[2]['5 ans']}%.
-              La perte maximale en stress est de {Math.abs(performanceScenarios[0]['1 an'])}%.
+              Pour un investissement initial de {kid.performanceScenarios.initialInvestment.toLocaleString()} {kid.productDetails.currency}, 
+              le produit présente une dispersion de performance de{' '}
+              {(performanceScenarios.find(s => s.scenario === 'Favorable')?.['5 ans'] || 0 - 
+                performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans'] || 0).toFixed(1)}% 
+              sur 5 ans. Le scénario intermédiaire montre un rendement de {performanceScenarios.find(s => s.scenario === 'Intermediaire')?.['5 ans']}% 
+              sur 5 ans, soit un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount.toLocaleString()} {kid.productDetails.currency}.
+              En cas de scénario de tensions, la perte maximale à 1 an pourrait atteindre {Math.abs(performanceScenarios.find(s => s.scenario === 'Tensions')?.['1 an'] || 0)}%, 
+              soit un montant de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Tensions')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount.toLocaleString()} {kid.productDetails.currency}.
             </p>
           </div>
 
@@ -157,18 +182,21 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <p className="text-sm text-yellow-600">
               Les coûts cumulés sur 5 ans représentent {cumulativeCosts[5].coûtsCumulés}% 
               de l'investissement, soit {((Number(cumulativeCosts[5].coûtsCumulés) / 5)).toFixed(2)}% 
-              par an en moyenne. Les coûts sont plus élevés la première année 
-              ({costs.entry}% de frais d'entrée).
+              par an en moyenne. Les coûts d'entrée sont de {(costs.entry).toFixed(2)}%, 
+              les coûts récurrents de {(costs.ongoing).toFixed(2)}% par an, 
+              et les coûts accessoires (commission de performance) de {(costs.incidental).toFixed(2)}% par an.
             </p>
           </div>
 
           <div className="p-4 bg-green-50 rounded-lg">
             <h4 className="font-medium text-green-800 mb-2">Horizon d'Investissement</h4>
             <p className="text-sm text-green-600">
-              La période de détention recommandée est de 5 ans. 
-              Les scénarios montrent une amélioration progressive des performances minimales, 
-              passant de {performanceScenarios[1]['1 an']}% à {performanceScenarios[1]['5 ans']}% 
-              dans le scénario défavorable.
+              La période de détention recommandée est de {kid.redemptionInformation.recommendedHoldingPeriod}. 
+              Dans le scénario défavorable, la performance s'améliore de {performanceScenarios.find(s => s.scenario === 'Defavorable')?.['1 an']}% à 1 an 
+              ({kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Defavorable')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount.toLocaleString()} {kid.productDetails.currency}) 
+              à {performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans']}% à 5 ans
+              ({kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Defavorable')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount.toLocaleString()} {kid.productDetails.currency}).
+              {kid.redemptionInformation.earlyRedemptionPossible && " Le rachat anticipé est possible."}
             </p>
           </div>
         </div>

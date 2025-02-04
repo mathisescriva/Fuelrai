@@ -1,17 +1,50 @@
-export interface Cost {
-  label: string;
-  value: number;
+export interface Period {
+  holdingPeriod: string;
+  finalAmount: number;
+  performance: string;
 }
 
-export interface KeyInfo {
+export interface Scenario {
+  scenarioName: string;
+  periods: Period[];
+}
+
+export interface PerformanceScenarios {
+  initialInvestment: number;
+  scenarios: Scenario[];
+}
+
+export interface CompositionOfCosts {
+  entryCosts: number;
+  exitCosts: number;
+  ongoingCosts: number;
+  transactionCosts: number;
+  incidentalCosts: number;
+}
+
+export interface Costs {
+  compositionOfCosts: CompositionOfCosts;
+}
+
+export interface ProductDetails {
+  productName: string;
+  productType: string;
   isin: string;
-  issuer: string;
-  guarantor: string;
-  authority: string;
-  issueDate: string;
-  maturityDate: string;
   currency: string;
-  nominalAmount: string;
+}
+
+export interface Risks {
+  riskIndicator: string;
+  sriScale: {
+    lowest: number;
+    highest: number;
+    current: number;
+  };
+}
+
+export interface RedemptionInformation {
+  recommendedHoldingPeriod: string;
+  earlyRedemptionPossible: boolean;
 }
 
 export interface KID {
@@ -19,6 +52,13 @@ export interface KID {
   name: string;
   url: string;
   file: File;
-  costs: Cost[];
-  keyInfo: KeyInfo;
+  documentTitle: string;
+  documentLanguage: string;
+  documentDate: string;
+  manufacturerName: string;
+  productDetails: ProductDetails;
+  risks: Risks;
+  performanceScenarios: PerformanceScenarios;
+  costs: Costs;
+  redemptionInformation: RedemptionInformation;
 }

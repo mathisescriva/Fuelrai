@@ -1,30 +1,35 @@
 import React from 'react';
-
-interface KeyInfo {
-  isin: string;
-  issuer: string;
-  guarantor: string;
-  authority: string;
-  issueDate: string;
-  maturityDate: string;
-  currency: string;
-  nominalAmount: string;
-}
+import { KID } from '../types';
 
 interface KeyInformationProps {
-  info: KeyInfo;
+  info: KID;
 }
 
 const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
   const infoItems = [
-    { label: 'ISIN', value: info.isin },
-    { label: 'Émetteur', value: info.issuer },
-    { label: 'Garant', value: info.guarantor },
-    { label: 'Autorité compétente', value: info.authority },
-    { label: "Date d'émission", value: info.issueDate },
-    { label: "Date d'échéance", value: info.maturityDate },
-    { label: 'Devise', value: info.currency },
-    { label: 'Montant nominal', value: info.nominalAmount },
+    // Informations générales
+    { label: 'Nom du produit', value: info.productDetails.productName },
+    { label: 'Type de produit', value: info.productDetails.productType },
+    { label: 'ISIN', value: info.productDetails.isin },
+    { label: 'Émetteur', value: info.manufacturerName },
+    { label: 'Forme juridique', value: info.productDetails.legalFormOrStructure },
+    { label: 'Pays de commercialisation', value: info.productDetails.publicOfferCountries?.join(', ') || 'N/A' },
+    
+    // Objectifs et stratégie
+    { label: 'Objectif', value: info.objectivesAndStrategy?.objectives || 'N/A' },
+    { label: 'But', value: info.purpose || 'N/A' },
+    
+    // Informations pratiques
+    { label: 'Date du document', value: info.documentDate },
+    { label: 'Devise', value: info.productDetails.currency },
+    { label: 'Période de détention recommandée', value: info.redemptionInformation.recommendedHoldingPeriod },
+    { label: 'Rachat anticipé', value: info.redemptionInformation.earlyRedemptionPossible ? 'Possible' : 'Non possible' },
+    
+    // Risque
+    { label: 'Indicateur de risque', 
+      value: `${info.risks.riskIndicator} sur ${info.risks.sriScale.highest} (${info.risks.riskIndicator === '1' ? 'Risque le plus faible' : 
+             info.risks.riskIndicator === '7' ? 'Risque le plus élevé' : 'Risque intermédiaire'})` 
+    },
   ];
 
   return (
