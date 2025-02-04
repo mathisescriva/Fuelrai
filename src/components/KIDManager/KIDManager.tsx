@@ -460,19 +460,21 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           <div className="w-1/3">
             {/* Liste des KIDs */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Documents KID</h2>
-                <div className="flex space-x-4 mb-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-800">Documents KID</h2>
+                </div>
+                <div className="flex gap-4">
                   <button
                     onClick={startComparison}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
                     disabled={kids.length < 2}
                   >
                     Comparer les KIDs
                   </button>
                   <button
                     onClick={() => setShowKIDExplorer(true)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                     disabled={kids.length === 0}
                   >
                     Parcourir les KIDs
