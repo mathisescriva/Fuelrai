@@ -47,13 +47,16 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
   const kid = selectedKids[0]; // On prend le premier KID pour l'analyse
   
   // Transformation des scénarios de performance
+  const initialInvestment = kid.performanceScenarios.initialInvestment;
   const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
     const oneYear = scenario.periods.find(p => p.holdingPeriod === '1 an');
     const fiveYears = scenario.periods.find(p => p.holdingPeriod === '5 ans');
     return {
       scenario: scenario.scenarioName,
-      '1 an': parseFloat(oneYear?.performance || '0'),
-      '5 ans': parseFloat(fiveYears?.performance || '0')
+      '1 an': oneYear?.finalAmount || 0,
+      '5 ans': fiveYears?.finalAmount || 0,
+      '1 an %': parseFloat(oneYear?.performance || '0'),
+      '5 ans %': parseFloat(fiveYears?.performance || '0')
     };
   });
 
@@ -106,6 +109,16 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart 
               data={[
+                { période: 'Initial', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, initialInvestment])) },
+                { période: '3 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
+                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.25)
+                ])) },
+                { période: '6 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
+                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.5)
+                ])) },
+                { période: '9 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
+                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.75)
+                ])) },
                 { période: '1 an', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['1 an']])) },
                 { période: '5 ans', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['5 ans']])) }
               ]}
@@ -120,13 +133,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 axisLine={{ stroke: '#9E9E9E' }}
               />
               <YAxis 
-                tickFormatter={(value) => `${value}%`}
+                tickFormatter={(value) => `${value.toLocaleString('fr-FR')}€`}
                 stroke="#424242"
                 tick={{ fill: '#424242', fontSize: 12 }}
                 axisLine={{ stroke: '#9E9E9E' }}
               />
               <Tooltip 
-                formatter={(value) => [`${value}%`, 'Performance']}
+                formatter={(value) => [`${value.toLocaleString('fr-FR')}€`, 'Montant']}
                 contentStyle={{
                   backgroundColor: '#FFFFFF',
                   border: '1px solid #E0E0E0',
@@ -186,8 +199,12 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart 
                   data={[
-                    { période: '1 an', performance: scenario['1 an'] },
-                    { période: '5 ans', performance: scenario['5 ans'] }
+                    { période: 'Initial', montant: initialInvestment, performance: 0 },
+                    { période: '3 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.25), performance: scenario['1 an %'] * 0.25 },
+                    { période: '6 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.5), performance: scenario['1 an %'] * 0.5 },
+                    { période: '9 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.75), performance: scenario['1 an %'] * 0.75 },
+                    { période: '1 an', montant: scenario['1 an'], performance: scenario['1 an %'] },
+                    { période: '5 ans', montant: scenario['5 ans'], performance: scenario['5 ans %'] }
                   ]}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 >
@@ -199,13 +216,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                     axisLine={{ stroke: '#9E9E9E' }}
                   />
                   <YAxis 
-                    tickFormatter={(value) => `${value}%`}
+                    tickFormatter={(value) => `${value.toLocaleString('fr-FR')}€`}
                     stroke="#424242"
                     tick={{ fill: '#424242', fontSize: 12 }}
                     axisLine={{ stroke: '#9E9E9E' }}
                   />
                   <Tooltip 
-                    formatter={(value) => [`${value}%`, 'Performance']}
+                    formatter={(value) => [`${value.toLocaleString('fr-FR')}€`, 'Montant']}
                     contentStyle={{
                       backgroundColor: '#FFFFFF',
                       border: '1px solid #E0E0E0',
@@ -215,7 +232,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                   />
                   <Line 
                     type="monotone" 
-                    dataKey="performance" 
+                    dataKey="montant" 
                     stroke={scenario.scenario === 'Favorable' ? colors.favorable :
                            scenario.scenario === 'Intermediaire' ? colors.intermediaire :
                            scenario.scenario === 'Defavorable' ? colors.defavorable :
@@ -231,11 +248,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['1 an']}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['1 an %'].toLocaleString('fr-FR')}%</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 5 ans</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['5 ans']}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %'].toLocaleString('fr-FR')}%</p>
                 </div>
               </div>
             </div>
