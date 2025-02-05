@@ -4,15 +4,15 @@ import { KID } from '../types';
 // Fonction pour exporter au format RAG-Ready
 const exportToRAGFormat = (kids: KID[]) => {
   const ragReadyData = kids.map(kid => ({
-    title: kid.name,
+    title: kid.productDetails.productName,
     metadata: {
-      isin: kid.keyInfo.isin,
-      issuer: kid.keyInfo.issuer,
-      guarantor: kid.keyInfo.guarantor,
-      issueDate: kid.keyInfo.issueDate,
-      maturityDate: kid.keyInfo.maturityDate,
-      currency: kid.keyInfo.currency,
-      nominalAmount: kid.keyInfo.nominalAmount
+      isin: kid.productDetails.isin,
+      issuer: kid.manufacturerName,
+      currency: kid.productDetails.currency,
+      productType: kid.productDetails.productType,
+      legalForm: kid.productDetails.legalFormOrStructure,
+      riskLevel: kid.risks.riskIndicator,
+      recommendedHoldingPeriod: kid.redemptionInformation.recommendedHoldingPeriod
     },
     content: JSON.stringify(kid) // Inclut toutes les données pour le traitement RAG
   }));
@@ -36,7 +36,9 @@ const KIDExplorer: React.FC<KIDExplorerProps> = ({ kids, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredKids = kids.filter(kid =>
-    kid.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (kid.productDetails.productName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (kid.productDetails.isin || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (kid.manufacturerName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -73,15 +75,16 @@ const KIDExplorer: React.FC<KIDExplorerProps> = ({ kids, onClose }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredKids.map((kid) => (
             <div
-              key={kid.id}
+              key={kid.productDetails?.isin || Math.random().toString()}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow"
             >
-              <h3 className="font-semibold mb-2">{kid.name}</h3>
-              <div className="text-sm text-gray-600">
-                <p>ISIN: {kid.keyInfo.isin}</p>
-                <p>Émetteur: {kid.keyInfo.issuer}</p>
-                <p>Date d'émission: {kid.keyInfo.issueDate}</p>
-                <p>Date de maturité: {kid.keyInfo.maturityDate}</p>
+              <h3 className="font-semibold mb-2">{kid.productDetails?.productName || 'Produit sans nom'}</h3>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p><span className="font-medium">ISIN:</span> {kid.productDetails?.isin || 'Non spécifié'}</p>
+                <p><span className="font-medium">Émetteur:</span> {kid.manufacturerName || 'Non spécifié'}</p>
+                <p><span className="font-medium">Type:</span> {kid.productDetails?.productType || 'Non spécifié'}</p>
+                <p><span className="font-medium">Devise:</span> {kid.productDetails?.currency || 'EUR'}</p>
+                <p><span className="font-medium">Risque:</span> {kid.risks?.riskIndicator ? `${kid.risks.riskIndicator}/7` : 'Non spécifié'}</p>
               </div>
             </div>
           ))}
