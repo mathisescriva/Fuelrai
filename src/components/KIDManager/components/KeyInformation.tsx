@@ -98,12 +98,7 @@ const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
       category: 'Objectifs'
     },
 
-    // Risques
-    { 
-      label: 'Indicateur de risque', 
-      value: getDefaultValue(info.risks?.riskIndicator),
-      category: 'Risques'
-    },
+
 
     // Rachat
     { 
@@ -123,7 +118,7 @@ const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
     }
   ];
 
-  const categories = ['Document', 'Produit', 'Objectifs', 'Risques', 'Rachat'];
+  const categories = ['Document', 'Produit', 'Objectifs', 'Rachat'];
 
   return (
     <div className="space-y-4">
