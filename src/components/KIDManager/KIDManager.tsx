@@ -5,6 +5,7 @@ import CostBreakdown from './components/CostBreakdown';
 import KeyInformation from './components/KeyInformation';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
 import KIDExplorer from './components/KIDExplorer';
+import JsonViewer from './components/JsonViewer';
 import { KID, Cost, KeyInfo } from './types';
 import { defaultKidData } from '../../data/defaultKidData';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -450,9 +451,10 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
 
             {/* Prévisualisation du PDF */}
             {selectedKid && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-800">Prévisualisation</h2>
+              <div className="space-y-6">
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">Prévisualisation</h2>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
@@ -518,6 +520,10 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                       </Document>
                     </div>
                   )}
+                </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <JsonViewer data={selectedKid} />
                 </div>
               </div>
             )}
