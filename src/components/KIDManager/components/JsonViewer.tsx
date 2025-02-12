@@ -58,7 +58,7 @@ const JsonViewer: React.FC<JsonViewerProps> = ({ data }) => {
               <span>Voir en plein écran</span>
             </button>
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 overflow-x-auto border border-blue-100 max-h-[400px] overflow-y-auto">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 overflow-x-auto border border-blue-100 max-h-[885px] overflow-y-auto">
             <pre className="text-sm text-gray-800 font-mono whitespace-pre-wrap" style={{ width: 'max-content', minWidth: '100%' }}>
               {JSON.stringify(data, null, 2)}
             </pre>
