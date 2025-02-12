@@ -57,6 +57,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       '5 ans': fiveYears?.finalAmount || 0,
       '1 an %': parseFloat((oneYear?.performance || '0').replace(' %', '').replace(',', '.')),
       '5 ans %': parseFloat((fiveYears?.performance || '0').replace(' %', '').replace(',', '.')),
+      'performance1an': oneYear?.performance || '0 %',
+      'performance5ans': fiveYears?.performance || '0 %',
       'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
@@ -250,11 +252,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['1 an %']}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['1 an %'].toFixed(2)} %</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 5 ans</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %']}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %'].toFixed(2)} %</p>
                 </div>
               </div>
             </div>
