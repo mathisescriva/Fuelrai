@@ -250,11 +250,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['1 an %'].toLocaleString('fr-FR')}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['1 an %']}%</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 5 ans</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %'].toLocaleString('fr-FR')}%</p>
+                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %']}%</p>
                 </div>
               </div>
             </div>
@@ -270,8 +270,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <LineChart data={cumulativeCosts}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="année" />
-              <YAxis tickFormatter={(value) => `${value}%`} />
-              <Tooltip formatter={(value) => `${value}%`} />
+              <YAxis />
+              <Tooltip 
+                formatter={(value) => value}
+                labelFormatter={(label) => `Période: ${label}`}
+              />
               <Legend />
               <Line 
                 type="monotone" 
@@ -292,13 +295,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
           <div className="p-3 bg-gray-50 rounded-lg">
             <p className="text-gray-600">Coût total sur 5 ans</p>
             <p className="font-semibold text-gray-900">
-              {cumulativeCosts[5].coûtsCumulés}%
+              {cumulativeCosts[5].coûtsCumulés}
             </p>
           </div>
           <div className="p-3 bg-gray-50 rounded-lg">
             <p className="text-gray-600">Coût annuel moyen</p>
             <p className="font-semibold text-gray-900">
-              {((Number(cumulativeCosts[5].coûtsCumulés) / 5)).toFixed(2)}%
+              {Math.round(Number(cumulativeCosts[5].coûtsCumulés) / 5)}%
             </p>
           </div>
         </div>
