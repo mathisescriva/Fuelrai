@@ -11,7 +11,7 @@ const RiskLevel: React.FC<RiskLevelProps> = ({ riskIndicator }) => {
   return (
     <div className="space-y-2">
       <h3 className="font-medium text-gray-700">Niveau de risque</h3>
-      <div className="bg-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-200">
+      <div className="bg-gray-50 p-4 rounded-lg transition-all duration-200">
         <div className="flex space-x-1">
           {Array.from({ length: maxLevel }, (_, i) => i + 1).map((level) => (
             <div

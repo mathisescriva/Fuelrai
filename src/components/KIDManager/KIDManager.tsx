@@ -248,17 +248,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Sélection des KIDs à comparer</h2>
-              <button
-                onClick={() => selectedKidsForComparison.length === 2 && startComparison()}
-                className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
-                  selectedKidsForComparison.length === 2
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
-                disabled={selectedKidsForComparison.length !== 2}
-              >
-                Comparer les KIDs
-              </button>
+
             </div>
             <div className="grid grid-cols-1 gap-4">
               {kids.map((kid) => (
@@ -300,7 +290,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           {selectedKidsForComparison.length === 2 && (
             <>
               {/* Prévisualisation côte à côte */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="bg-white rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-800">Prévisualisation Comparative</h2>
                   <div className="flex gap-2">
@@ -360,7 +350,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
               </div>
 
               {/* Analyse comparative */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="bg-white rounded-xl p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-semibold text-gray-800">Analyse Comparative</h2>
                   <button
@@ -402,29 +392,14 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-semibold text-gray-800">Documents KID</h2>
                 </div>
-                <div className="flex gap-4">
-                  <button
-                    onClick={startComparison}
-                    className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-                    disabled={kids.length < 2}
-                  >
-                    Comparer les KIDs
-                  </button>
-                  <button
-                    onClick={() => setShowKIDExplorer(true)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                    disabled={kids.length === 0}
-                  >
-                    Parcourir les KIDs
-                  </button>
-                </div>
+
               </div>
               <div className="grid grid-cols-1 gap-4">
                 {kids.map((kid) => (
                   <div
                     key={kid.id}
                     onClick={() => selectKid(kid)}
-                    className={`bg-gray-50 rounded-xl p-4 cursor-pointer transition-all hover:shadow-md border-2 ${
+                    className={`bg-gray-50 rounded-xl p-4 cursor-pointer transition-all border-2 ${
                       selectedKid?.id === kid.id ? 'border-blue-500 bg-blue-50' : 'border-transparent'
                     }`}
                   >
@@ -452,8 +427,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
             {/* Prévisualisation du PDF */}
             {selectedKid && (
               <div className="space-y-6">
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="bg-white rounded-xl p-6">         <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-gray-800">Prévisualisation</h2>
                   <div className="flex gap-2">
                     <button
