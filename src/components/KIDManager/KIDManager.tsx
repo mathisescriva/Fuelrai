@@ -395,7 +395,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
         // Interface normale
         <div className="flex gap-8">
           {/* Section de gauche : Liste des KIDs et Prévisualisation */}
-          <div className="w-1/3">
+          <div className="w-1/2">
             {/* Liste des KIDs */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <div className="flex flex-col gap-4">
@@ -522,7 +522,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                   )}
                 </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="bg-white rounded-xl shadow-sm p-6 border-t-4 border-blue-500 mt-6">
                   <JsonViewer data={selectedKid} />
                 </div>
               </div>
@@ -530,7 +530,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           </div>
 
           {/* Section de droite : Analyse */}
-          <div className="w-2/3">
+          <div className="w-1/2">
             {selectedKid ? (
               <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
                 <div className="flex justify-between items-center">
