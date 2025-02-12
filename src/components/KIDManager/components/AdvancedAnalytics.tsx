@@ -79,28 +79,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
     };
   });
 
-  // Analyse des coûts
-  const costs = {
-    entry: kid.costs.compositionOfCosts.entryCosts,
-    exit: kid.costs.compositionOfCosts.exitCosts,
-    ongoing: kid.costs.compositionOfCosts.ongoingCosts,
-    transaction: kid.costs.compositionOfCosts.transactionCosts,
-    incidental: kid.costs.compositionOfCosts.incidentalCosts
-  };
 
-  const cumulativeCosts = Array.from({ length: 6 }, (_, i) => {
-    const year = i;
-    const entryExitAmortized = (costs.entry + costs.exit) / 5;
-    const recurring = costs.ongoing + costs.transaction + costs.incidental;
-    const annualCost = entryExitAmortized + recurring;
-    return {
-      année: year === 0 ? 'Initial' : `Année ${year}`,
-      coûts: year === 0 ? costs.entry : Math.round(annualCost),
-      coûtsCumulés: year === 0 
-        ? costs.entry 
-        : Math.round(costs.entry + annualCost * year)
-    };
-  });
 
   return (
     <div className="space-y-6">
@@ -264,50 +243,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
         ))}
       </div>
 
-      {/* Impact des coûts dans le temps */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Impact des Coûts dans le Temps</h3>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={cumulativeCosts}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="année" />
-              <YAxis />
-              <Tooltip 
-                formatter={(value) => value}
-                labelFormatter={(label) => `Période: ${label}`}
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="coûts" 
-                stroke="#82ca9d" 
-                name="Coûts annuels"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="coûtsCumulés" 
-                stroke="#8884d8" 
-                name="Coûts cumulés"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">Coût total sur 5 ans</p>
-            <p className="font-semibold text-gray-900">
-              {cumulativeCosts[5].coûtsCumulés}
-            </p>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">Coût annuel moyen</p>
-            <p className="font-semibold text-gray-900">
-              {Math.round(Number(cumulativeCosts[5].coûtsCumulés) / 5)}%
-            </p>
-          </div>
-        </div>
-      </div>
+
 
       {/* Analyse des points clés */}
       <div className="bg-white rounded-xl shadow-sm p-6">
@@ -330,11 +266,9 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
           <div className="p-4 bg-yellow-50 rounded-lg">
             <h4 className="font-medium text-yellow-800 mb-2">Impact des Coûts</h4>
             <p className="text-sm text-yellow-600">
-              Les coûts cumulés sur 5 ans représentent {cumulativeCosts[5].coûtsCumulés}% 
-              de l'investissement, soit {((Number(cumulativeCosts[5].coûtsCumulés) / 5)).toFixed(2)}% 
-              par an en moyenne. Les coûts d'entrée sont de {(costs.entry).toFixed(2)}%, 
-              les coûts récurrents de {(costs.ongoing).toFixed(2)}% par an, 
-              et les coûts accessoires (commission de performance) de {(costs.incidental).toFixed(2)}% par an.
+              Les coûts d'entrée sont de {kid.costs.compositionOfCosts.entryCosts}%, 
+              les coûts récurrents de {kid.costs.compositionOfCosts.ongoingCosts}% par an, 
+              et les coûts accessoires (commission de performance) de {kid.costs.compositionOfCosts.incidentalCosts}% par an.
             </p>
           </div>
 
