@@ -25,6 +25,12 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [numPages, setNumPages] = useState<number>(0);
   const [pdfError, setPdfError] = useState<string>('');
+
+  // Réinitialiser l'état quand on change de KID
+  useEffect(() => {
+    setPageNumber(1);
+    setPdfError('');
+  }, [selectedKid?.id]);
   const [kids, setKids] = useState<KID[]>([]);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [showKIDExplorer, setShowKIDExplorer] = useState(false);
@@ -474,12 +480,15 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                         options={{
                           cMapUrl: 'cmaps/',
                           cMapPacked: true,
-                          standardFontDataUrl: 'standard_fonts/'
+                          standardFontDataUrl: 'standard_fonts/',
+                          workerSrc: `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
                         }}
                       >
                         <Page
                           pageNumber={pageNumber}
                           width={300}
+                          renderAnnotationLayer={false}
+                          renderTextLayer={false}
                           loading={
                             <div className="flex items-center justify-center p-8">
                               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
