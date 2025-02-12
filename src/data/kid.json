@@ -1,0 +1,110 @@
+{
+  "documentTitle": "Informations clés sur le produit Magna New Frontiers Fund – R Class Shares",
+  "documentLanguage": "en",
+  "documentDate": "19 janvier 2024",
+  "manufacturerName": "Fiera Capital (UK) Limited",
+  "productDetails": {
+    "productName": "Magna New Frontiers Fund – R Class Shares",
+    "productType": "OPCVM",
+    "isin": "IE00B68FF474",
+    "publicOfferCountries": ["IE"],
+    "legalFormOrStructure": "Société d'investissement à capital variable à responsabilité limitée et à responsabilité séparée entre les Fonds",
+    "currency": "EUR",
+    "issueDate": "",
+    "maturityDate": "",
+    "underlyingAssets": []
+  },
+  "purpose": "Investissement en titres de marchés frontières internationaux",
+  "objectivesAndStrategy": {
+    "objectives": "Croissance du capital",
+    "horizonRecommended": "5 ans"
+  },
+  "risks": {
+    "riskIndicator": "5",
+    "sriScale": {
+      "lowest": 1,
+      "highest": 7,
+      "current": 0
+    }
+  },
+  "performanceScenarios": {
+    "initialInvestment": 10000,
+    "scenarios": [
+      {
+        "scenarioName": "Tensions",
+        "periods": [
+          {
+            "holdingPeriod": "1 an",
+            "finalAmount": 870,
+            "performance": "-91,3 %"
+          },
+          {
+            "holdingPeriod": "5 ans",
+            "finalAmount": 800,
+            "performance": "-39,65 %"
+          }
+        ]
+      },
+      {
+        "scenarioName": "Defavorable",
+        "periods": [
+          {
+            "holdingPeriod": "1 an",
+            "finalAmount": 6240,
+            "performance": "-37,58 %"
+          },
+          {
+            "holdingPeriod": "5 ans",
+            "finalAmount": 8740,
+            "performance": "-2,67 %"
+          }
+        ]
+      },
+      {
+        "scenarioName": "Intermediaire",
+        "periods": [
+          {
+            "holdingPeriod": "1 an",
+            "finalAmount": 10380,
+            "performance": "3,83 %"
+          },
+          {
+            "holdingPeriod": "5 ans",
+            "finalAmount": 14520,
+            "performance": "7,74 %"
+          }
+        ]
+      },
+      {
+        "scenarioName": "Favorable",
+        "periods": [
+          {
+            "holdingPeriod": "1 an",
+            "finalAmount": 17010,
+            "performance": "70,09 %"
+          },
+          {
+            "holdingPeriod": "5 ans",
+            "finalAmount": 17350,
+            "performance": "11,64 %"
+          }
+        ]
+      }
+    ]
+  },
+  "costs": {
+    "costsOverTime": [],
+    "compositionOfCosts": {
+      "entryCosts": 600,
+      "exitCosts": 0,
+      "ongoingCosts": 291,
+      "transactionCosts": 0,
+      "incidentalCosts": 211
+    }
+  },
+  "redemptionInformation": {
+    "recommendedHoldingPeriod": "5 ans",
+    "earlyRedemptionPossible": true,
+    "earlyRedemptionPenalties": ""
+  }
+}

@@ -55,8 +55,9 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       scenario: scenario.scenarioName,
       '1 an': oneYear?.finalAmount || 0,
       '5 ans': fiveYears?.finalAmount || 0,
-      '1 an %': parseFloat(oneYear?.performance || '0'),
-      '5 ans %': parseFloat(fiveYears?.performance || '0')
+      '1 an %': parseFloat((oneYear?.performance || '0').replace(',', '.')),
+      '5 ans %': parseFloat((fiveYears?.performance || '0').replace(',', '.')),
+      'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
 
@@ -71,7 +72,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       période: period,
       'Écart favorable/défavorable': favorable - defavorable,
       'Potentiel de perte': tensions,
-      'Performance moyenne': intermediaire
+      'Performance moyenne': intermediaire,
+      'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
 

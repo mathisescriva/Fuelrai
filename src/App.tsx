@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/kid-analyzer" element={
           <MainLayout>
-            <KIDManager />
+            <KIDManager onUpload={(files) => console.log('Files uploaded:', files)} />
           </MainLayout>
         } />
         <Route path="/annual-reports" element={

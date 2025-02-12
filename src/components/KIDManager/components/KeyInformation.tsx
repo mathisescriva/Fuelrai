@@ -27,79 +27,109 @@ const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
   };
 
   const infoItems = [
-    // Informations générales
+    // Document
     { 
-      label: 'Nom du produit', 
-      value: getDefaultValue(info.productDetails?.productName, 'Nom du produit non spécifié'),
-      category: 'Général'
+      label: 'Titre du document', 
+      value: getDefaultValue(info.documentTitle),
+      category: 'Document'
     },
     { 
-      label: 'Type de produit', 
-      value: getDefaultValue(info.productDetails?.productType, 'Produit financier'),
-      category: 'Général'
+      label: 'Langue', 
+      value: getDefaultValue(info.documentLanguage),
+      category: 'Document'
+    },
+    { 
+      label: 'Date du document', 
+      value: getDefaultValue(info.documentDate),
+      category: 'Document'
+    },
+    { 
+      label: 'Fabricant', 
+      value: getDefaultValue(info.manufacturerName),
+      category: 'Document'
+    },
+
+    // Produit
+    { 
+      label: 'Nom du produit', 
+      value: getDefaultValue(info.productDetails?.productName),
+      category: 'Produit'
+    },
+    { 
+      label: 'Type', 
+      value: getDefaultValue(info.productDetails?.productType),
+      category: 'Produit'
     },
     { 
       label: 'ISIN', 
-      value: getDefaultValue(info.productDetails?.isin, 'ISIN non disponible'),
-      category: 'Général'
-    },
-    { 
-      label: 'Émetteur', 
-      value: getDefaultValue(info.manufacturerName, 'Émetteur non spécifié'),
-      category: 'Général'
-    },
-    { 
-      label: 'Forme juridique', 
-      value: getDefaultValue(info.productDetails?.legalFormOrStructure, 'OPCVM'),
-      category: 'Général'
+      value: getDefaultValue(info.productDetails?.isin),
+      category: 'Produit'
     },
     { 
       label: 'Pays de commercialisation', 
-      value: getDefaultValue(info.productDetails?.publicOfferCountries?.join(', '), 'France'),
-      category: 'Général'
-    },
-    
-    // Objectifs et stratégie
-    { 
-      label: 'Objectif', 
-      value: getDefaultValue(info.objectivesAndStrategy?.objectives, 'L\'objectif est d\'obtenir une performance supérieure à celle de son indice de référence sur la durée de placement recommandée'),
-      category: 'Stratégie'
+      value: getDefaultValue(info.productDetails?.publicOfferCountries?.join(', ')),
+      category: 'Produit'
     },
     { 
-      label: 'But', 
-      value: getDefaultValue(info.purpose, 'Valorisation du capital sur le long terme'),
-      category: 'Stratégie'
-    },
-    
-    // Informations pratiques
-    { 
-      label: 'Date du document', 
-      value: getDefaultValue(info.documentDate ? formatDate(info.documentDate) : null, formatDate(new Date().toISOString())),
-      category: 'Pratique'
+      label: 'Forme juridique', 
+      value: getDefaultValue(info.productDetails?.legalFormOrStructure),
+      category: 'Produit'
     },
     { 
       label: 'Devise', 
-      value: getDefaultValue(info.productDetails?.currency, 'EUR'),
-      category: 'Pratique'
+      value: getDefaultValue(info.productDetails?.currency),
+      category: 'Produit'
+    },
+
+    // Objectifs
+    { 
+      label: 'Objectif principal', 
+      value: getDefaultValue(info.purpose),
+      category: 'Objectifs'
     },
     { 
+      label: 'Détails de la stratégie', 
+      value: getDefaultValue(info.objectivesAndStrategy?.objectives),
+      category: 'Objectifs'
+    },
+    { 
+      label: 'Horizon recommandé', 
+      value: getDefaultValue(info.objectivesAndStrategy?.horizonRecommended),
+      category: 'Objectifs'
+    },
+
+    // Risques
+    { 
+      label: 'Indicateur de risque', 
+      value: getDefaultValue(info.risks?.riskIndicator),
+      category: 'Risques'
+    },
+
+    // Rachat
+    { 
       label: 'Période de détention recommandée', 
-      value: getDefaultValue(info.redemptionInformation?.recommendedHoldingPeriod, '5 ans'),
-      category: 'Pratique'
+      value: getDefaultValue(info.redemptionInformation?.recommendedHoldingPeriod),
+      category: 'Rachat'
     },
     { 
       label: 'Rachat anticipé', 
-      value: getDefaultValue(info.redemptionInformation?.earlyRedemptionPossible ? 'Possible' : 'Non possible', 'Possible avec conditions'),
-      category: 'Pratique'
+      value: info.redemptionInformation?.earlyRedemptionPossible ? 'Possible' : 'Non possible',
+      category: 'Rachat'
     },
-    
+    { 
+      label: 'Pénalités de rachat anticipé', 
+      value: getDefaultValue(info.redemptionInformation?.earlyRedemptionPenalties, 'Aucune pénalité'),
+      category: 'Rachat'
+    }
   ];
+
+  const categories = ['Document', 'Produit', 'Objectifs', 'Risques', 'Rachat'];
 
   return (
     <div className="space-y-4">
       <h3 className="font-medium text-gray-700">Informations clés</h3>
       <div className="space-y-6">
-        {['Général', 'Stratégie', 'Pratique'].map(category => (
+        {categories.map(category => (
           <div key={category} className="space-y-3">
             <h4 className="text-sm font-medium text-gray-500">{category}</h4>
             <div className="grid grid-cols-2 gap-4">

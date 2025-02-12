@@ -6,6 +6,7 @@ import KeyInformation from './components/KeyInformation';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
 import KIDExplorer from './components/KIDExplorer';
 import { KID, Cost, KeyInfo } from './types';
+import { defaultKidData } from '../../data/defaultKidData';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -108,80 +109,16 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
         // Limiter à 5 fichiers maximum
         const newFiles = Array.from(files).slice(0, 5 - kids.length);
         
-        const kidData = {
-          documentTitle: "Informations clés sur le produit Magna New Frontiers Fund – R Class Shares",
-          documentLanguage: "en",
-          documentDate: "19 janvier 2024",
-          manufacturerName: "Fiera Capital (UK) Limited",
-          productDetails: {
-            productName: "Magna New Frontiers Fund – R Class Shares",
-            productType: "OPCVM",
-            isin: "IE00B68FF474",
-            currency: "EUR"
-          },
-          risks: {
-            riskIndicator: "4",
-            sriScale: {
-              lowest: 1,
-              highest: 7,
-              current: 4
-            }
-          },
-          performanceScenarios: {
-            initialInvestment: 10000,
-            scenarios: [
-              {
-                scenarioName: "Tensions",
-                periods: [
-                  { holdingPeriod: "1 an", finalAmount: 870, performance: "-91.3" },
-                  { holdingPeriod: "5 ans", finalAmount: 800, performance: "-39.65" }
-                ]
-              },
-              {
-                scenarioName: "Defavorable",
-                periods: [
-                  { holdingPeriod: "1 an", finalAmount: 6240, performance: "-37.58" },
-                  { holdingPeriod: "5 ans", finalAmount: 8740, performance: "-2.67" }
-                ]
-              },
-              {
-                scenarioName: "Intermediaire",
-                periods: [
-                  { holdingPeriod: "1 an", finalAmount: 10380, performance: "3.83" },
-                  { holdingPeriod: "5 ans", finalAmount: 14520, performance: "7.74" }
-                ]
-              },
-              {
-                scenarioName: "Favorable",
-                periods: [
-                  { holdingPeriod: "1 an", finalAmount: 17010, performance: "70.09" },
-                  { holdingPeriod: "5 ans", finalAmount: 17350, performance: "11.64" }
-                ]
-              }
-            ]
-          },
-          costs: {
-            compositionOfCosts: {
-              entryCosts: 500,
-              exitCosts: 0,
-              ongoingCosts: 291,
-              transactionCosts: 0,
-              incidentalCosts: 211
-            }
-          },
-          redemptionInformation: {
-            recommendedHoldingPeriod: "5 ans",
-            earlyRedemptionPossible: true
-          }
-        };
-
+        // Utiliser les données par défaut depuis le fichier defaultKidData.ts
         const newKids: KID[] = newFiles.map((file, index) => ({
           id: Date.now() + index,
           name: file.name,
           url: URL.createObjectURL(file),
           file,
-          ...kidData
+          ...defaultKidData
         }));
+
+
 
         setKids(prevKids => {
           // Révoquer les anciennes URLs avant de les remplacer
@@ -604,7 +541,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                   <AdvancedAnalytics selectedKids={[selectedKid]} />
                 ) : (
                   <>
-                    <RiskLevel level={parseInt(selectedKid.risks.riskIndicator)} />
+                    <RiskLevel riskIndicator={selectedKid.risks.riskIndicator} />
                     <CostBreakdown costs={selectedKid.costs} />
                     <KeyInformation info={selectedKid} />
                   </>
