@@ -55,8 +55,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       scenario: scenario.scenarioName,
       '1 an': oneYear?.finalAmount || 0,
       '5 ans': fiveYears?.finalAmount || 0,
-      '1 an %': parseFloat((oneYear?.performance || '0').replace(',', '.')),
-      '5 ans %': parseFloat((fiveYears?.performance || '0').replace(',', '.')),
+      '1 an %': parseFloat((oneYear?.performance || '0').replace(' %', '').replace(',', '.')),
+      '5 ans %': parseFloat((fiveYears?.performance || '0').replace(' %', '').replace(',', '.')),
       'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
@@ -79,11 +79,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   // Analyse des coûts
   const costs = {
-    entry: kid.costs.compositionOfCosts.entryCosts / 100,
-    exit: kid.costs.compositionOfCosts.exitCosts / 100,
-    ongoing: kid.costs.compositionOfCosts.ongoingCosts / 100,
-    transaction: kid.costs.compositionOfCosts.transactionCosts / 100,
-    incidental: kid.costs.compositionOfCosts.incidentalCosts / 100
+    entry: kid.costs.compositionOfCosts.entryCosts,
+    exit: kid.costs.compositionOfCosts.exitCosts,
+    ongoing: kid.costs.compositionOfCosts.ongoingCosts,
+    transaction: kid.costs.compositionOfCosts.transactionCosts,
+    incidental: kid.costs.compositionOfCosts.incidentalCosts
   };
 
   const cumulativeCosts = Array.from({ length: 6 }, (_, i) => {
@@ -93,10 +93,10 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
     const annualCost = entryExitAmortized + recurring;
     return {
       année: year === 0 ? 'Initial' : `Année ${year}`,
-      coûts: year === 0 ? costs.entry : annualCost.toFixed(2),
+      coûts: year === 0 ? costs.entry : Math.round(annualCost),
       coûtsCumulés: year === 0 
         ? costs.entry 
-        : (costs.entry + annualCost * year).toFixed(2)
+        : Math.round(costs.entry + annualCost * year)
     };
   });
 
