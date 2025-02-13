@@ -203,7 +203,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
               <div className="mb-4">
                 {processingSteps[processingStep].icon}
               </div>
-              <p className="text-lg font-semibold mb-2">Traitement en cours</p>
+              <p className="text-lg font-semibold mb-2 text-black">Traitement en cours</p>
               <p className="text-gray-600 text-center">{processingSteps[processingStep].message}</p>
               <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
                 <div 
