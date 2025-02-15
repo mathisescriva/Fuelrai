@@ -8,6 +8,7 @@ import KIDExplorer from './components/KIDExplorer';
 import JsonViewer from './components/JsonViewer';
 import { KID, Cost, KeyInfo } from './types';
 import { defaultKidData } from '../../data/defaultKidData';
+import { KIDService } from '../../services/kidService';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -116,26 +117,33 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
         // Limiter à 5 fichiers maximum
         const newFiles = Array.from(files).slice(0, 5 - kids.length);
         
-        // Utiliser les données par défaut depuis le fichier defaultKidData.ts
-        const newKids: KID[] = newFiles.map((file, index) => ({
-          id: Date.now() + index,
-          name: file.name,
-          url: URL.createObjectURL(file),
-          file,
-          ...defaultKidData
-        }));
-
-
-
-        setKids(prevKids => {
-          // Révoquer les anciennes URLs avant de les remplacer
-          prevKids.forEach(kid => {
-            if (kid.url.startsWith('blob:')) {
-              URL.revokeObjectURL(kid.url);
-            }
+        for (const file of newFiles) {
+          // Analyser le PDF avec le backend
+          await KIDService.analyzePDF(file);
+          
+          // Récupérer le JSON du KID
+          const kidData = await KIDService.getKIDJson();
+          
+          const newKid: KID = {
+            id: Date.now(),
+            name: file.name,
+            url: URL.createObjectURL(file),
+            file,
+            ...kidData
+          };
+          
+          setKids(prevKids => {
+            // Révoquer les anciennes URLs avant de les remplacer
+            prevKids.forEach(kid => {
+              if (kid.url.startsWith('blob:')) {
+                URL.revokeObjectURL(kid.url);
+              }
+            });
+            return [...prevKids, newKid];
           });
-          return [...prevKids, ...newKids];
-        });
+        }
+
+
 
         if (onUpload) {
           onUpload(files);
