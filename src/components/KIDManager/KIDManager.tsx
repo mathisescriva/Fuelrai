@@ -97,51 +97,53 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
     }
   ];
 
-  const simulateProcessing = async () => {
-    setIsProcessing(true);
-    for (let i = 0; i < processingSteps.length; i++) {
-      setProcessingStep(i);
-      // Temps d'attente plus long pour chaque étape (entre 1.5s et 2.5s)
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
-    }
-    setIsProcessing(false);
-    setProcessingStep(0);
-  };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      await simulateProcessing();
-      
       try {
-        // Limiter à 5 fichiers maximum
-        const newFiles = Array.from(files).slice(0, 5 - kids.length);
+        setIsProcessing(true);
+        setProcessingStep(0); // Analyse de la structure du document
+
+        const file = files[0]; // On ne prend que le premier fichier
         
-        for (const file of newFiles) {
-          // Analyser le PDF avec le backend
-          await KIDService.analyzePDF(file);
-          
-          // Récupérer le JSON du KID
-          const kidData = await KIDService.getKIDJson();
-          
-          const newKid: KID = {
-            id: Date.now(),
-            name: file.name,
-            url: URL.createObjectURL(file),
-            file,
-            ...kidData
-          };
-          
-          setKids(prevKids => {
-            // Révoquer les anciennes URLs avant de les remplacer
-            prevKids.forEach(kid => {
-              if (kid.url.startsWith('blob:')) {
-                URL.revokeObjectURL(kid.url);
-              }
-            });
-            return [...prevKids, newKid];
+        setProcessingStep(1); // Extraction des tableaux et données numériques
+        // Analyser le PDF avec le backend
+        await KIDService.analyzePDF(file);
+        
+        setProcessingStep(2); // Identification des sections clés
+        // Récupérer le JSON du KID
+        const kidData = await KIDService.getKIDJson();
+        
+        setProcessingStep(3); // Extraction du contexte et des relations
+        
+        const newKid: KID = {
+          id: Date.now(),
+          name: file.name,
+          url: URL.createObjectURL(file),
+          file,
+          ...kidData
+        };
+        
+        // Révoquer les anciennes URLs et remplacer l'ancien KID
+        setKids(prevKids => {
+          prevKids.forEach(kid => {
+            if (kid.url.startsWith('blob:')) {
+              URL.revokeObjectURL(kid.url);
+            }
           });
-        }
+          return [newKid]; // On ne garde que le nouveau KID
+        });
+        
+        setProcessingStep(4); // Traitement des images et graphiques
+        
+        // Sélectionner automatiquement le nouveau KID
+        setSelectedKid(newKid);
+        setPageNumber(1);
+        setPdfError('');
+        
+        setProcessingStep(5); // Finalisation de l'intégration
+        setIsProcessing(false);
+        setProcessingStep(0);
 
 
 
