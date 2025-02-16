@@ -1,67 +1,47 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import netlifyIdentity from 'netlify-identity-widget';
+import { authService } from '../services/authService';
 
 interface AuthContextType {
-  user: any;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  user: string | null;
+  login: (username: string, password: string) => Promise<void>;
+  logout: () => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialiser Netlify Identity
-    netlifyIdentity.init();
-
-    // Écouter les changements d'authentification
-    netlifyIdentity.on('login', (user) => {
-      setUser(user);
-      netlifyIdentity.close();
-    });
-
-    netlifyIdentity.on('logout', () => {
-      setUser(null);
-    });
-
-    // Vérifier si l'utilisateur est déjà connecté
-    const currentUser = netlifyIdentity.currentUser();
-    if (currentUser) {
-      setUser(currentUser);
+    // Vérifie l'authentification au chargement
+    if (authService.isAuthenticated()) {
+      setUser('elixir@fuelrai.com');
     }
-
-    return () => {
-      netlifyIdentity.off('login');
-      netlifyIdentity.off('logout');
-    };
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     try {
-      await netlifyIdentity.open('login');
+      const response = await authService.login(username, password);
+      setUser(response.user);
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Erreur de connexion');
     }
   };
 
-  const logout = async () => {
-    try {
-      await netlifyIdentity.logout();
-    } catch (error) {
-      console.error('Erreur de déconnexion:', error);
-      throw error;
-    }
+  const logout = () => {
+    authService.logout();
+    setUser(null);
   };
 
   const value = {
     user,
     login,
     logout,
-    isAuthenticated: !!user
+    isAuthenticated: authService.isAuthenticated()
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -6,7 +6,7 @@ import KeyInformation from './components/KeyInformation';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
 import KIDExplorer from './components/KIDExplorer';
 import JsonViewer from './components/JsonViewer';
-import { KID, Cost, KeyInfo } from './types';
+import { KID } from './types';
 import { defaultKidData } from '../../data/defaultKidData';
 import { KIDService } from '../../services/kidService';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
@@ -391,7 +391,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
                       <div key={kid.id}>
                         <h3 className="font-medium text-gray-800 mb-4">Document {index + 1}</h3>
                         <div className="space-y-6">
-                          <RiskLevel level={parseInt(kid.risks.riskIndicator)} />
+                          <RiskLevel riskIndicator={kid.risks.riskIndicator} />
                           <CostBreakdown costs={kid.costs} />
                           <KeyInformation info={kid} />
                         </div>

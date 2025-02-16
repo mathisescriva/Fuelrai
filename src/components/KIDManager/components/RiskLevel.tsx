@@ -2,6 +2,7 @@ import React from 'react';
 
 interface RiskLevelProps {
   riskIndicator: string;
+  level?: number;
 }
 
 const RiskLevel: React.FC<RiskLevelProps> = ({ riskIndicator }) => {
