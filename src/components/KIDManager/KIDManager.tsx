@@ -9,6 +9,9 @@ import JsonViewer from './components/JsonViewer';
 import { KID } from './types';
 import { defaultKidData } from '../../data/defaultKidData';
 import { KIDService } from '../../services/kidService';
+import { useApi } from '../../hooks/useApi';
+import { useToast } from '../Toast/Toast';
+import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -20,6 +23,8 @@ interface KIDManagerProps {
 }
 
 export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
+  const { loading, error, callApi } = useApi();
+  const { showToast } = useToast();
   const [selectedKid, setSelectedKid] = useState<KID | null>(null);
   const [isComparing, setIsComparing] = useState(false);
   const [selectedKidsForComparison, setSelectedKidsForComparison] = useState<KID[]>([]);
@@ -32,10 +37,10 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
     setPageNumber(1);
     setPdfError('');
   }, [selectedKid?.id]);
+
   const [kids, setKids] = useState<KID[]>([]);
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(false);
   const [showKIDExplorer, setShowKIDExplorer] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
 
   const processingSteps = [
@@ -100,10 +105,10 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      try {
-        setIsProcessing(true);
-        const file = files[0]; // On ne prend que le premier fichier
+      const file = files[0]; // On ne prend que le premier fichier
+      setProcessingStep(0);
 
+      const result = await callApi(async () => {
         // Analyser le PDF avec le backend
         await KIDService.analyzePDF(file, (progress) => {
           // Calculer l'étape en fonction de la progression
@@ -133,6 +138,10 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           ...kidData
         };
         
+        return newKid;
+      });
+
+      if (result) {
         // Révoquer les anciennes URLs et remplacer l'ancien KID
         setKids(prevKids => {
           prevKids.forEach(kid => {
@@ -140,28 +149,20 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
               URL.revokeObjectURL(kid.url);
             }
           });
-          return [newKid]; // On ne garde que le nouveau KID
+          return [result]; // On ne garde que le nouveau KID
         });
         
         // Sélectionner automatiquement le nouveau KID
-        setSelectedKid(newKid);
+        setSelectedKid(result);
         setPageNumber(1);
         setPdfError('');
-        
-        setIsProcessing(false);
         setProcessingStep(0);
-
-
 
         if (onUpload) {
           onUpload(files);
         }
 
-        // Réinitialiser les erreurs si le chargement réussit
-        setPdfError('');
-      } catch (error) {
-        console.error('Erreur lors du chargement des fichiers:', error);
-        setPdfError('Erreur lors du chargement des fichiers. Veuillez réessayer.');
+        showToast('Document KID analysé avec succès', 'success');
       }
     }
   };
@@ -198,6 +199,32 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
   const onDocumentLoadError = (error: Error) => {
     console.error('Erreur PDF:', error);
     setPdfError('Erreur lors du chargement du PDF. Veuillez vérifier que le fichier est un PDF valide.');
+    showToast('Erreur lors du chargement du PDF', 'error');
+  };
+
+  const renderProcessingStep = () => {
+    if (!loading) return null;
+    const currentStep = processingSteps[processingStep];
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+          <div className="flex items-center space-x-4 mb-4">
+            {currentStep.icon}
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {currentStep.message}
+              </h3>
+              <div className="mt-2 h-2 bg-gray-200 rounded-full">
+                <div
+                  className="h-full bg-purple-500 rounded-full transition-all duration-500"
+                  style={{ width: `${(processingStep + 1) * 16.67}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -212,7 +239,7 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
 
   return (
     <div className="p-6">
-      {isProcessing && (
+      {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <div className="flex flex-col items-center">
@@ -246,9 +273,9 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
             )}
           </div>
           <label className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200 relative">
-            {isProcessing && (
+            {loading && (
               <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
+                <span className="text-sm text-gray-600">Chargement...</span>
               </div>
             )}
             <input

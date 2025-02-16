@@ -1,23 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useApi } from '../../hooks/useApi';
+import { useToast } from '../Toast/Toast';
+import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { loading, error, callApi } = useApi();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
+    const result = await callApi(async () => {
       await login(email, password);
+      return true;
+    });
+
+    if (result) {
+      showToast('Connexion réussie', 'success');
       navigate('/dashboard');
-    } catch (error) {
-      setError('Erreur de connexion. Vérifiez vos identifiants.');
     }
   };
+
+  if (loading) {
+    return <LoadingSpinner message="Connexion en cours..." />;
+  }
 
   return (
     <div className="flex-1 w-full bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">

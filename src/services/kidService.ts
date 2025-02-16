@@ -1,5 +1,12 @@
 import { API_CONFIG } from './api.config';
 
+class KIDServiceError extends Error {
+    constructor(message: string, public statusCode?: number) {
+        super(message);
+        this.name = 'KIDServiceError';
+    }
+}
+
 export class KIDService {
     private static baseHeaders = {
         'X-API-Key': API_CONFIG.API_KEY
@@ -20,30 +27,33 @@ export class KIDService {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('Erreur lors de la vérification du statut:', errorText);
-                return false;
+                throw new KIDServiceError(
+                    `Erreur lors de la vérification du statut: ${errorText}`,
+                    response.status
+                );
             }
 
             const responseText = await response.text();
-            console.log('Réponse brute du statut:', responseText);
 
             try {
                 const data = JSON.parse(responseText);
-                console.log('Statut de l\'analyse:', data);
                 
-                // Mise à jour de la progression
                 if (onProgress && typeof data.progress === 'number') {
                     onProgress(data.progress);
                 }
 
+                if (data.error) {
+                    throw new KIDServiceError(`Erreur d'analyse: ${data.error}`);
+                }
+
                 return data.status === 'completed';
             } catch (e) {
-                console.error('Erreur lors du parsing du statut:', e);
-                return false;
+                if (e instanceof KIDServiceError) throw e;
+                throw new KIDServiceError('Format de réponse invalide');
             }
         } catch (error) {
-            console.error('Erreur lors de la vérification du statut:', error);
-            return false;
+            if (error instanceof KIDServiceError) throw error;
+            throw new KIDServiceError('Erreur de connexion au service');
         }
     }
 

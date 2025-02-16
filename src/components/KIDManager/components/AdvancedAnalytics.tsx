@@ -240,11 +240,21 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['1 an %'].toFixed(2)} %</p>
+                  <p className="text-base font-medium text-gray-900">
+                    {(scenario['1 an %'] !== undefined && !isNaN(Number(scenario['1 an %']))) 
+                      ? Number(scenario['1 an %']).toFixed(2)
+                      : 'N/A'
+                    } %
+                  </p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 5 ans</p>
-                  <p className="text-base font-medium text-gray-900">{scenario['5 ans %'].toFixed(2)} %</p>
+                  <p className="text-base font-medium text-gray-900">
+                    {(scenario['5 ans %'] !== undefined && !isNaN(Number(scenario['5 ans %']))) 
+                      ? Number(scenario['5 ans %']).toFixed(2)
+                      : 'N/A'
+                    } %
+                  </p>
                 </div>
               </div>
             </div>
@@ -263,11 +273,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <p className="text-sm text-blue-600">
               Pour un investissement initial de {kid.performanceScenarios.initialInvestment.toLocaleString()} {kid.productDetails.currency}, 
               le produit présente une dispersion de performance de{' '}
-              {(performanceScenarios.find(s => s.scenario === 'Favorable')?.['5 ans'] || 0 - 
-                performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans'] || 0).toFixed(1)}% 
-              sur 5 ans. Le scénario intermédiaire montre un rendement de {performanceScenarios.find(s => s.scenario === 'Intermediaire')?.['5 ans']}% 
-              sur 5 ans, soit un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount.toLocaleString()} {kid.productDetails.currency}.
-              En cas de scénario de tensions, la perte maximale à 1 an pourrait atteindre {Math.abs(performanceScenarios.find(s => s.scenario === 'Tensions')?.['1 an'] || 0)}%, 
+              {((Number(performanceScenarios.find(s => s.scenario === 'Favorable')?.['5 ans']) || 0) - 
+                (Number(performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans']) || 0)).toFixed(1)}% 
+              sur 5 ans. Le scénario intermédiaire montre un rendement de {(Number(performanceScenarios.find(s => s.scenario === 'Intermediaire')?.['5 ans']) || 0).toFixed(1)}% 
+              sur 5 ans, soit un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
+              En cas de scénario de tensions, la perte maximale à 1 an pourrait atteindre {Math.abs(Number(performanceScenarios.find(s => s.scenario === 'Tensions')?.['1 an']) || 0).toFixed(1)}%, 
               soit un montant de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Tensions')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount.toLocaleString()} {kid.productDetails.currency}.
             </p>
           </div>
