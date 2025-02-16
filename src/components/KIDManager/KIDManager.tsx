@@ -102,19 +102,28 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
     if (files && files.length > 0) {
       try {
         setIsProcessing(true);
-        setProcessingStep(0); // Analyse de la structure du document
-
         const file = files[0]; // On ne prend que le premier fichier
-        
-        setProcessingStep(1); // Extraction des tableaux et données numériques
+
         // Analyser le PDF avec le backend
-        await KIDService.analyzePDF(file);
+        await KIDService.analyzePDF(file, (progress) => {
+          // Calculer l'étape en fonction de la progression
+          if (progress < 20) {
+            setProcessingStep(0); // Analyse de la structure du document
+          } else if (progress < 40) {
+            setProcessingStep(1); // Extraction des tableaux et données numériques
+          } else if (progress < 60) {
+            setProcessingStep(2); // Identification des sections clés
+          } else if (progress < 80) {
+            setProcessingStep(3); // Extraction du contexte et des relations
+          } else if (progress < 90) {
+            setProcessingStep(4); // Traitement des images et graphiques
+          } else {
+            setProcessingStep(5); // Finalisation de l'intégration
+          }
+        });
         
-        setProcessingStep(2); // Identification des sections clés
         // Récupérer le JSON du KID
         const kidData = await KIDService.getKIDJson();
-        
-        setProcessingStep(3); // Extraction du contexte et des relations
         
         const newKid: KID = {
           id: Date.now(),
@@ -134,14 +143,11 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
           return [newKid]; // On ne garde que le nouveau KID
         });
         
-        setProcessingStep(4); // Traitement des images et graphiques
-        
         // Sélectionner automatiquement le nouveau KID
         setSelectedKid(newKid);
         setPageNumber(1);
         setPdfError('');
         
-        setProcessingStep(5); // Finalisation de l'intégration
         setIsProcessing(false);
         setProcessingStep(0);
 

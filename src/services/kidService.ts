@@ -9,7 +9,7 @@ export class KIDService {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    private static async checkAnalysisStatus(taskId: string): Promise<boolean> {
+    private static async checkAnalysisStatus(taskId: string, onProgress?: (progress: number) => void): Promise<boolean> {
         try {
             const response = await fetch(
                 `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CHECK_STATUS}/${taskId}`,
@@ -30,6 +30,12 @@ export class KIDService {
             try {
                 const data = JSON.parse(responseText);
                 console.log('Statut de l\'analyse:', data);
+                
+                // Mise à jour de la progression
+                if (onProgress && typeof data.progress === 'number') {
+                    onProgress(data.progress);
+                }
+
                 return data.status === 'completed';
             } catch (e) {
                 console.error('Erreur lors du parsing du statut:', e);
@@ -41,13 +47,14 @@ export class KIDService {
         }
     }
 
-    private static async waitForAnalysisCompletion(taskId: string, maxAttempts: number = 60): Promise<boolean> {
+    private static async waitForAnalysisCompletion(taskId: string, onProgress?: (progress: number) => void, maxAttempts: number = 60): Promise<boolean> {
         // Vérification toutes les 15 secondes pendant 15 minutes maximum
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
             console.log(`Vérification du statut de l'analyse... (${attempt + 1}/${maxAttempts}, ${Math.round((attempt + 1) * 15 / 60)} minutes)`);
             
-            const isCompleted = await this.checkAnalysisStatus(taskId);
+            const isCompleted = await this.checkAnalysisStatus(taskId, onProgress);
             if (isCompleted) {
+                if (onProgress) onProgress(100);
                 return true;
             }
 
@@ -60,7 +67,7 @@ export class KIDService {
         return false;
     }
 
-    static async analyzePDF(file: File): Promise<void> {
+    static async analyzePDF(file: File, onProgress?: (progress: number) => void): Promise<void> {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -103,7 +110,7 @@ export class KIDService {
 
             if (data.task_id) {
                 console.log('Analyse démarrée, vérification du statut...');
-                const isCompleted = await this.waitForAnalysisCompletion(data.task_id);
+                const isCompleted = await this.waitForAnalysisCompletion(data.task_id, onProgress);
                 
                 if (!isCompleted) {
                     throw new Error(
