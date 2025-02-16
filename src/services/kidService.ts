@@ -18,12 +18,12 @@ export class KIDService {
 
     private static async checkAnalysisStatus(taskId: string, onProgress?: (progress: number) => void): Promise<boolean> {
         try {
-            const response = await fetch(
-                `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CHECK_STATUS}/${taskId}`,
-                {
-                    headers: this.baseHeaders
-                }
-            );
+            const url = new URL(API_CONFIG.ENDPOINTS.CHECK_STATUS, API_CONFIG.BASE_URL);
+            url.pathname = `${url.pathname}/${taskId}`.replace(/\/+/g, '/');
+            
+            const response = await fetch(url.toString(), {
+                headers: this.baseHeaders
+            });
 
             if (!response.ok) {
                 const errorText = await response.text();
