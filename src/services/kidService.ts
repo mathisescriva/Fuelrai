@@ -170,12 +170,27 @@ export class KIDService {
                 ...data,
                 costs: {
                     compositionOfCosts: {
-                        entryCosts: data.costs?.entryCosts || 0,
-                        exitCosts: data.costs?.exitCosts || 0,
-                        ongoingCosts: data.costs?.ongoingCosts?.otherOngoingCosts || 0,
-                        transactionCosts: data.costs?.ongoingCosts?.portfolioTransactionCosts || 0,
-                        incidentalCosts: data.costs?.ongoingCosts?.performanceFees || 0
+                        entryCosts: data.costs?.compositionOfCosts?.entryCosts || 0,
+                        exitCosts: data.costs?.compositionOfCosts?.exitCosts || 0,
+                        ongoingCosts: data.costs?.compositionOfCosts?.ongoingCosts?.otherOngoingCosts || 0,
+                        transactionCosts: data.costs?.compositionOfCosts?.ongoingCosts?.portfolioTransactionCosts || 0,
+                        incidentalCosts: (
+                            data.costs?.compositionOfCosts?.incidentalCosts?.performanceFees ||
+                            data.costs?.compositionOfCosts?.incidentalCosts?.carriedInterests ||
+                            0
+                        )
                     }
+                },
+                performanceScenarios: {
+                    initialInvestment: data.performanceScenarios?.initialInvestment || 10000,
+                    scenarios: (data.performanceScenarios?.scenarios || []).map((scenario: any) => ({
+                        scenarioName: scenario.scenarioName,
+                        periods: scenario.periods.map((period: any) => ({
+                            holdingPeriod: period.holdingPeriod === '1year' ? '1 an' : '5 ans',
+                            performance: period.annualPerformance,
+                            finalAmount: period.finalAmount
+                        }))
+                    }))
                 }
             };
         } catch (error) {

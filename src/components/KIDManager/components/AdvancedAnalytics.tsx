@@ -51,14 +51,23 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
   const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
     const oneYear = scenario.periods.find(p => p.holdingPeriod === '1 an');
     const fiveYears = scenario.periods.find(p => p.holdingPeriod === '5 ans');
+    
+    // Mapper les noms de scénarios en français
+    const scenarioMapping: { [key: string]: string } = {
+      'Stress': 'Tensions',
+      'Unfavorable': 'Defavorable',
+      'Moderate': 'Intermediaire',
+      'Favorable': 'Favorable'
+    };
+
     return {
-      scenario: scenario.scenarioName,
+      scenario: scenarioMapping[scenario.scenarioName] || scenario.scenarioName,
       '1 an': oneYear?.finalAmount || 0,
       '5 ans': fiveYears?.finalAmount || 0,
-      '1 an %': parseFloat((oneYear?.performance || '0').replace(' %', '').replace(',', '.')),
-      '5 ans %': parseFloat((fiveYears?.performance || '0').replace(' %', '').replace(',', '.')),
-      'performance1an': oneYear?.performance || '0 %',
-      'performance5ans': fiveYears?.performance || '0 %',
+      '1 an %': oneYear?.performance || 0,
+      '5 ans %': fiveYears?.performance || 0,
+      'performance1an': `${oneYear?.performance || 0}%`,
+      'performance5ans': `${fiveYears?.performance || 0}%`,
       'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
