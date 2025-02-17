@@ -118,7 +118,53 @@ const KeyInformation: React.FC<KeyInformationProps> = ({ info }) => {
     }
   ];
 
-  const categories = ['Document', 'Produit', 'Objectifs', 'Rachat'];
+  // Fonction pour formater les coûts accessoires
+  const formatIncidentalCosts = (incidentalCosts: any) => {
+    if (!incidentalCosts) return 'N/A';
+    if (typeof incidentalCosts === 'string') return incidentalCosts;
+    
+    const fees = [];
+    if (incidentalCosts.performanceFees) fees.push(`Performance: ${incidentalCosts.performanceFees}`);
+    if (incidentalCosts.carriedInterests) fees.push(`Intérêts: ${incidentalCosts.carriedInterests}`);
+    return fees.length > 0 ? fees.join(', ') : '0';
+  };
+
+  // Fonction pour formater les coûts récurrents
+  const formatOngoingCosts = (ongoingCosts: any) => {
+    if (!ongoingCosts) return 'N/A';
+    if (typeof ongoingCosts === 'string') return ongoingCosts;
+    
+    const costs = [];
+    if (ongoingCosts.portfolioTransactionCosts) costs.push(`Transaction: ${ongoingCosts.portfolioTransactionCosts}`);
+    if (ongoingCosts.otherOngoingCosts) costs.push(`Autres: ${ongoingCosts.otherOngoingCosts}`);
+    return costs.length > 0 ? costs.join(', ') : '0';
+  };
+
+  const categories = ['Document', 'Produit', 'Objectifs', 'Coûts', 'Rachat'];
+
+  // Ajouter les coûts aux items d'information
+  infoItems.push(
+    { 
+      label: "Coûts d'entrée", 
+      value: getDefaultValue(info.costs?.compositionOfCosts?.entryCosts),
+      category: 'Coûts'
+    },
+    { 
+      label: "Coûts de sortie", 
+      value: getDefaultValue(info.costs?.compositionOfCosts?.exitCosts),
+      category: 'Coûts'
+    },
+    { 
+      label: "Coûts récurrents", 
+      value: formatOngoingCosts(info.costs?.compositionOfCosts?.ongoingCosts),
+      category: 'Coûts'
+    },
+    { 
+      label: "Coûts accessoires", 
+      value: formatIncidentalCosts(info.costs?.compositionOfCosts?.incidentalCosts),
+      category: 'Coûts'
+    }
+  );
 
   return (
     <div className="space-y-4">

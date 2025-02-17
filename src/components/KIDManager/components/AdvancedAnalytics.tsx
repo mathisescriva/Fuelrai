@@ -54,8 +54,14 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
     const period2 = scenario.periods[1];
 
     // Convertir les performances en nombres pour les graphiques
-    const perf1 = period1.annualPerformance ? parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', '')) : 0;
-    const perf2 = period2.annualPerformance ? parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', '')) : 0;
+    const perf1 = period1.annualPerformance ? 
+      (typeof period1.annualPerformance === 'number' ? 
+        period1.annualPerformance : 
+        parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', ''))) : 0;
+    const perf2 = period2.annualPerformance ? 
+      (typeof period2.annualPerformance === 'number' ? 
+        period2.annualPerformance : 
+        parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', ''))) : 0;
 
     return {
       scenario: scenario.scenarioName,
@@ -234,13 +240,17 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
                   <p className="text-base font-medium text-gray-900">
-                    {scenario[`performance1an`] || 'N/A %'}
+                    {typeof scenario[`performance1an`] === 'number' ? 
+                      `${scenario[`performance1an`].toFixed(2)}%` : 
+                      scenario[`performance1an`] || 'N/A'}
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
-                  <p className="text-sm text-gray-600 mb-1">Performance à 8 ans</p>
+                  <p className="text-sm text-gray-600 mb-1">Performance à {periods[1]}</p>
                   <p className="text-base font-medium text-gray-900">
-                    {scenario[`performance8ans`] || 'N/A %'}
+                    {typeof scenario[`performance${periods[1].replace(' ', '')}`] === 'number' ? 
+                      `${scenario[`performance${periods[1].replace(' ', '')}`].toFixed(2)}%` : 
+                      scenario[`performance${periods[1].replace(' ', '')}`] || 'N/A'}
                   </p>
                 </div>
               </div>
@@ -269,9 +279,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
           <div className="p-4 bg-yellow-50 rounded-lg">
             <h4 className="font-medium text-yellow-800 mb-2">Impact des Coûts</h4>
             <p className="text-sm text-yellow-600">
-              Les coûts d'entrée sont de {kid.costs.compositionOfCosts.entryCosts}%, 
-              les coûts récurrents de {kid.costs.compositionOfCosts.ongoingCosts}% par an, 
-              et les coûts accessoires (commission de performance) de {kid.costs.compositionOfCosts.incidentalCosts}% par an.
+              Les coûts d'entrée sont de {kid.costs.compositionOfCosts.entryCosts || 'N/A'}, 
+              les coûts récurrents sont de {typeof kid.costs.compositionOfCosts.ongoingCosts === 'object' ? 
+                `${kid.costs.compositionOfCosts.ongoingCosts.otherOngoingCosts || '0'} (autres) et ${kid.costs.compositionOfCosts.ongoingCosts.portfolioTransactionCosts || '0'} (transactions)` : 
+                kid.costs.compositionOfCosts.ongoingCosts || 'N/A'}, 
+              et les coûts accessoires sont de {typeof kid.costs.compositionOfCosts.incidentalCosts === 'object' ? 
+                `${kid.costs.compositionOfCosts.incidentalCosts.performanceFees || '0'} (performance) et ${kid.costs.compositionOfCosts.incidentalCosts.carriedInterests || '0'} (intérêts)` : 
+                kid.costs.compositionOfCosts.incidentalCosts || 'N/A'}.
             </p>
           </div>
 
