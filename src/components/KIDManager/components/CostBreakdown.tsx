@@ -6,6 +6,9 @@ interface CostBreakdownProps {
 }
 
 const CostBreakdown: React.FC<CostBreakdownProps> = ({ costs }) => {
+  console.log('Costs received:', JSON.stringify(costs, null, 2));
+  console.log('Composition of costs:', costs.compositionOfCosts);
+  
   const { compositionOfCosts } = costs;
 
   // Fonction pour formater un coût (nombre ou chaîne)
@@ -50,8 +53,8 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ costs }) => {
   const costItems = [
     { label: "Coûts d'entrée", value: formatCost(compositionOfCosts.entryCosts) },
     { label: "Coûts de sortie", value: formatCost(compositionOfCosts.exitCosts) },
-    { label: "Coûts de transaction", value: formatCost(compositionOfCosts.ongoingCosts?.portfolioTransactionCosts) },
-    { label: "Coûts récurrents", value: formatCost(compositionOfCosts.ongoingCosts?.otherOngoingCosts) },
+    { label: "Coûts de transaction", value: formatCost(compositionOfCosts.transactionCosts) },
+    { label: "Coûts récurrents", value: formatCost(compositionOfCosts.ongoingCosts) },
     { label: "Coûts accessoires", value: formatIncidentalCosts(compositionOfCosts.incidentalCosts) }
   ];
 
