@@ -8,30 +8,12 @@ interface CostBreakdownProps {
 const CostBreakdown: React.FC<CostBreakdownProps> = ({ costs }) => {
   const { compositionOfCosts } = costs;
 
-  // Fonction pour formater les coûts
-  const formatCost = (cost: number | string) => {
-    if (typeof cost === 'string') {
-      // Si c'est une chaîne qui se termine par '%', on la convertit en nombre
-      if (cost.endsWith('%')) {
-        return Number(cost.replace('%', ''));
-      }
-      return Number(cost);
-    }
-    return cost;
-  };
-
-  // Fonction pour formater l'affichage
-  const formatDisplay = (value: number) => {
-    if (value === 0) return '0';
-    return `${value.toFixed(2)}%`;
-  };
-
   const costItems = [
-    { label: "Coûts d'entrée", value: formatCost(compositionOfCosts.entryCosts) },
-    { label: "Coûts de sortie", value: formatCost(compositionOfCosts.exitCosts) },
-    { label: "Coûts de transaction", value: formatCost(compositionOfCosts.transactionCosts) },
-    { label: "Coûts récurrents", value: formatCost(compositionOfCosts.ongoingCosts) },
-    { label: "Coûts accessoires", value: formatCost(compositionOfCosts.incidentalCosts) }
+    { label: "Coûts d'entrée", value: compositionOfCosts.entryCosts },
+    { label: "Coûts de sortie", value: compositionOfCosts.exitCosts },
+    { label: "Coûts de transaction", value: compositionOfCosts.transactionCosts },
+    { label: "Coûts récurrents", value: compositionOfCosts.ongoingCosts },
+    { label: "Coûts accessoires", value: compositionOfCosts.incidentalCosts }
   ];
 
 
@@ -46,7 +28,7 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ costs }) => {
           >
             <span className="text-gray-600 group-hover:text-gray-900">{cost.label}</span>
             <span className="font-medium text-gray-900 group-hover:scale-110 transition-transform duration-200">
-              {formatDisplay(cost.value)}
+              {cost.value || 'N/A'}
             </span>
           </div>
         ))}
