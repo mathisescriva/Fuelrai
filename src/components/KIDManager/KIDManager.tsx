@@ -12,6 +12,7 @@ import { KIDService } from '../../services/kidService';
 import { useApi } from '../../hooks/useApi';
 import { useToast } from '../Toast/Toast';
 import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
+import DemoWarning from './components/DemoWarning';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -53,18 +54,18 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
       )
     },
     {
-      message: "Extraction des tableaux et données numériques...",
-      icon: (
-        <svg className="w-8 h-8 text-purple-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3zm0 5h16" />
-        </svg>
-      )
-    },
-    {
       message: "Identification des sections clés...",
       icon: (
         <svg className="w-8 h-8 text-purple-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      )
+    },
+    {
+      message: "Envoi des résultats au LLM...",
+      icon: (
+        <svg className="w-8 h-8 text-purple-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
       )
     },
@@ -241,19 +242,20 @@ export const KIDManager: React.FC<KIDManagerProps> = ({ onUpload }) => {
     <div className="p-6">
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+          <div className="bg-white rounded-lg p-6 max-w-xl w-full">
             <div className="flex flex-col items-center">
               <div className="mb-4">
                 {processingSteps[processingStep].icon}
               </div>
               <p className="text-lg font-semibold mb-2 text-black">Traitement en cours</p>
               <p className="text-gray-600 text-center">{processingSteps[processingStep].message}</p>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-4 mb-6">
                 <div 
                   className="bg-purple-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${(processingStep + 1) * (100 / processingSteps.length)}%` }}
                 ></div>
               </div>
+              <DemoWarning />
             </div>
           </div>
         </div>
