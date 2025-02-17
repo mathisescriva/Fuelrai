@@ -20,6 +20,14 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
     return 'moderate'; // valeur par défaut
   };
 
+  // Fonction pour normaliser la période
+  const normalizePeriod = (period: string): string => {
+    const normalized = period.toLowerCase().replace(/\s+/g, '');
+    if (normalized.includes('1') || normalized.includes('one') || normalized.includes('un')) return '1year';
+    if (normalized.includes('mat')) return 'maturity';
+    return normalized;
+  };
+
   // Définition des couleurs professionnelles
   const colors = {
     favorable: '#2E7D32',
@@ -67,11 +75,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
     const perf1 = period1.annualPerformance ? 
       (typeof period1.annualPerformance === 'number' ? 
         period1.annualPerformance : 
-        parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', ''))) : 0;
+        parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', '').replace('-', '')) * (period1.annualPerformance.includes('-') ? -1 : 1)) : 0;
     const perf2 = period2.annualPerformance ? 
       (typeof period2.annualPerformance === 'number' ? 
         period2.annualPerformance : 
-        parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', ''))) : 0;
+        parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', '').replace('-', '')) * (period2.annualPerformance.includes('-') ? -1 : 1)) : 0;
 
     return {
       scenario: scenario.scenarioName,
@@ -79,8 +87,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       [period2.holdingPeriod]: period2.finalAmount,
       [`Performance ${period1.holdingPeriod}`]: perf1,
       [`Performance ${period2.holdingPeriod}`]: perf2,
-      [`performance${period1.holdingPeriod.replace(' ', '')}`]: period1.annualPerformance,
-      [`performance${period2.holdingPeriod.replace(' ', '')}`]: period2.annualPerformance,
+      [`performance${normalizePeriod(period1.holdingPeriod)}`]: period1.annualPerformance,
+      [`performance${normalizePeriod(period2.holdingPeriod)}`]: period2.annualPerformance,
       'Montant investi': initialInvestment
     };
   });
@@ -229,17 +237,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
                   <p className="text-base font-medium text-gray-900">
-                    {typeof scenario[`performance1an`] === 'number' ? 
-                      `${scenario[`performance1an`].toFixed(2)}%` : 
-                      scenario[`performance1an`] || 'N/A'}
+                    {scenario[`performance${normalizePeriod(periods[0])}`] || 'N/A'}
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à {periods[1]}</p>
                   <p className="text-base font-medium text-gray-900">
-                    {typeof scenario[`performance${periods[1].replace(' ', '')}`] === 'number' ? 
-                      `${scenario[`performance${periods[1].replace(' ', '')}`].toFixed(2)}%` : 
-                      scenario[`performance${periods[1].replace(' ', '')}`] || 'N/A'}
+                    {scenario[`performance${normalizePeriod(periods[1])}`] || 'N/A'}
                   </p>
                 </div>
               </div>
