@@ -64,33 +64,46 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   const kid = selectedKids[0]; // On prend le premier KID pour l'analyse
   
+  // Fonction pour extraire un nombre d'une chaîne avec devise
+  const extractNumberFromString = (value: string | number): number => {
+    if (typeof value === 'number') return value;
+    // Enlever la devise et les espaces, remplacer la virgule par un point
+    const numberStr = value.replace(/[A-Za-z\s]/g, '').replace(',', '.');
+    return parseFloat(numberStr);
+  };
+
+  // Fonction pour extraire un pourcentage d'une chaîne
+  const extractPercentage = (value: string | number): number => {
+    if (typeof value === 'number') return value;
+    const isNegative = value.includes('-');
+    const numberStr = value.replace(/[^0-9.,]/g, '').replace(',', '.');
+    return parseFloat(numberStr) * (isNegative ? -1 : 1);
+  };
+
   // Transformation des scénarios de performance
-  const initialInvestment = kid.performanceScenarios.initialInvestment;
+  const initialInvestment = extractNumberFromString(kid.performanceScenarios.initialInvestment);
   const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
-    // On prend les deux périodes disponibles
-    const period1 = scenario.periods[0];
-    const period2 = scenario.periods[1];
+    // Récupérer toutes les périodes disponibles
+    const periods = scenario.periods;
 
-    // Convertir les performances en nombres pour les graphiques
-    const perf1 = period1.annualPerformance ? 
-      (typeof period1.annualPerformance === 'number' ? 
-        period1.annualPerformance : 
-        parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', '').replace('-', '')) * (period1.annualPerformance.includes('-') ? -1 : 1)) : 0;
-    const perf2 = period2.annualPerformance ? 
-      (typeof period2.annualPerformance === 'number' ? 
-        period2.annualPerformance : 
-        parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', '').replace('-', '')) * (period2.annualPerformance.includes('-') ? -1 : 1)) : 0;
-
-    return {
+    // Créer un objet de base avec le scénario et le montant investi
+    const baseObject = {
       scenario: scenario.scenarioName,
-      [period1.holdingPeriod]: period1.finalAmount,
-      [period2.holdingPeriod]: period2.finalAmount,
-      [`Performance ${period1.holdingPeriod}`]: perf1,
-      [`Performance ${period2.holdingPeriod}`]: perf2,
-      [`performance${normalizePeriod(period1.holdingPeriod)}`]: period1.annualPerformance,
-      [`performance${normalizePeriod(period2.holdingPeriod)}`]: period2.annualPerformance,
       'Montant investi': initialInvestment
     };
+
+    // Ajouter les données pour chaque période
+    return periods.reduce((acc, period) => {
+      const finalAmount = extractNumberFromString(period.finalAmount);
+      const perf = extractPercentage(period.annualPerformance);
+      
+      return {
+        ...acc,
+        [period.holdingPeriod]: finalAmount,
+        [`Performance ${period.holdingPeriod}`]: perf,
+        [`performance${normalizePeriod(period.holdingPeriod)}`]: period.annualPerformance
+      };
+    }, baseObject);
   });
 
   // Récupérer les périodes du premier scénario
