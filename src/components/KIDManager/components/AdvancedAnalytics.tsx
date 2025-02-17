@@ -46,38 +46,41 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   const kid = selectedKids[0]; // On prend le premier KID pour l'analyse
   
+  // Fonction pour parser une performance en pourcentage
+  const parsePerformance = (perfStr: string): number => {
+    if (!perfStr) return 0;
+    // Remplace la virgule par un point et enlève le symbole %
+    return parseFloat(perfStr.replace(',', '.').replace(' %', ''));
+  };
+
   // Transformation des scénarios de performance
   const initialInvestment = kid.performanceScenarios.initialInvestment;
   const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
-    const oneYear = scenario.periods.find(p => p.holdingPeriod === '1 an');
-    const fiveYears = scenario.periods.find(p => p.holdingPeriod === '5 ans');
+    // On prend les deux périodes disponibles
+    const period1 = scenario.periods[0];
+    const period2 = scenario.periods[1];
     
-    // Mapper les noms de scénarios en français
-    const scenarioMapping: { [key: string]: string } = {
-      'Stress': 'Tensions',
-      'Unfavorable': 'Defavorable',
-      'Moderate': 'Intermediaire',
-      'Favorable': 'Favorable'
-    };
+    const performance1 = parsePerformance(period1.performance);
+    const performance2 = parsePerformance(period2.performance);
 
     return {
-      scenario: scenarioMapping[scenario.scenarioName] || scenario.scenarioName,
-      '1 an': oneYear?.finalAmount || 0,
-      '5 ans': fiveYears?.finalAmount || 0,
-      '1 an %': oneYear?.performance || 0,
-      '5 ans %': fiveYears?.performance || 0,
-      'performance1an': `${oneYear?.performance || 0}%`,
-      'performance5ans': `${fiveYears?.performance || 0}%`,
+      scenario: scenario.scenarioName,
+      'Période 1': period1.finalAmount,
+      'Période 2': period2.finalAmount,
+      'Performance 1': performance1,
+      'Performance 2': performance2,
+      'performancePeriode1': `${performance1.toFixed(2)}%`,
+      'performancePeriode2': `${performance2.toFixed(2)}%`,
       'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
 
   // Calcul de l'évolution des scénarios dans le temps
-  const timeEvolution = ['1 an', '5 ans'].map(period => {
+  const timeEvolution = ['Période 1', 'Période 2'].map(period => {
     const favorable = performanceScenarios.find(s => s.scenario === 'Favorable')?.[period] || 0;
-    const defavorable = performanceScenarios.find(s => s.scenario === 'Defavorable')?.[period] || 0;
+    const defavorable = performanceScenarios.find(s => s.scenario === 'Défavorable')?.[period] || 0;
     const tensions = performanceScenarios.find(s => s.scenario === 'Tensions')?.[period] || 0;
-    const intermediaire = performanceScenarios.find(s => s.scenario === 'Intermediaire')?.[period] || 0;
+    const intermediaire = performanceScenarios.find(s => s.scenario === 'Intermédiaire')?.[period] || 0;
 
     return {
       période: period,
@@ -102,17 +105,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <AreaChart 
               data={[
                 { période: 'Initial', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, initialInvestment])) },
-                { période: '3 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
-                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.25)
-                ])) },
-                { période: '6 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
-                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.5)
-                ])) },
-                { période: '9 mois', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, 
-                  initialInvestment + ((s['1 an'] - initialInvestment) * 0.75)
-                ])) },
-                { période: '1 an', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['1 an']])) },
-                { période: '5 ans', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['5 ans']])) }
+                { période: 'Période 1', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['Période 1']])) },
+                { période: 'Période 2', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['Période 2']])) }
               ]}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
@@ -192,11 +186,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 <LineChart 
                   data={[
                     { période: 'Initial', montant: initialInvestment, performance: 0 },
-                    { période: '3 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.25), performance: scenario['1 an %'] * 0.25 },
-                    { période: '6 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.5), performance: scenario['1 an %'] * 0.5 },
-                    { période: '9 mois', montant: initialInvestment + ((scenario['1 an'] - initialInvestment) * 0.75), performance: scenario['1 an %'] * 0.75 },
-                    { période: '1 an', montant: scenario['1 an'], performance: scenario['1 an %'] },
-                    { période: '5 ans', montant: scenario['5 ans'], performance: scenario['5 ans %'] }
+                    { période: 'Période 1', montant: scenario['Période 1'], performance: scenario['Performance 1'] },
+                    { période: 'Période 2', montant: scenario['Période 2'], performance: scenario['Performance 2'] }
                   ]}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 >

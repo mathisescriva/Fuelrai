@@ -15,11 +15,11 @@ export interface PerformanceScenarios {
 }
 
 export interface CompositionOfCosts {
-  entryCosts: number;
-  exitCosts: number;
-  ongoingCosts: number;
-  transactionCosts: number;
-  incidentalCosts: number;
+  entryCosts: number | string;
+  exitCosts: number | string;
+  ongoingCosts: number | string;
+  transactionCosts: number | string;
+  incidentalCosts: number | string;
 }
 
 export interface Costs {
