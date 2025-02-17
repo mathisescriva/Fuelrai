@@ -2,6 +2,7 @@ export interface Period {
   holdingPeriod: string;
   finalAmount: number;
   performance: string;
+  annualPerformance: string;
 }
 
 export interface Scenario {

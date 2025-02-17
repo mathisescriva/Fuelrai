@@ -175,34 +175,7 @@ export class KIDService {
                 throw new Error('Invalid JSON response from server');
             }
 
-            // Transformer les données pour correspondre à notre interface
-            return {
-                ...data,
-                costs: {
-                    compositionOfCosts: {
-                        entryCosts: data.costs?.compositionOfCosts?.entryCosts || 0,
-                        exitCosts: data.costs?.compositionOfCosts?.exitCosts || 0,
-                        ongoingCosts: data.costs?.compositionOfCosts?.ongoingCosts?.otherOngoingCosts || 0,
-                        transactionCosts: data.costs?.compositionOfCosts?.ongoingCosts?.portfolioTransactionCosts || 0,
-                        incidentalCosts: (
-                            data.costs?.compositionOfCosts?.incidentalCosts?.performanceFees ||
-                            data.costs?.compositionOfCosts?.incidentalCosts?.carriedInterests ||
-                            0
-                        )
-                    }
-                },
-                performanceScenarios: {
-                    initialInvestment: data.performanceScenarios?.initialInvestment || 10000,
-                    scenarios: (data.performanceScenarios?.scenarios || []).map((scenario: any) => ({
-                        scenarioName: scenario.scenarioName,
-                        periods: scenario.periods.map((period: any) => ({
-                            holdingPeriod: period.holdingPeriod === '1year' ? '1 an' : '5 ans',
-                            performance: period.annualPerformance,
-                            finalAmount: period.finalAmount
-                        }))
-                    }))
-                }
-            };
+            return data;
         } catch (error) {
             console.error('Error fetching KID JSON:', error);
             throw error;

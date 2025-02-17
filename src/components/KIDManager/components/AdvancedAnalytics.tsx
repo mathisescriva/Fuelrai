@@ -46,37 +46,34 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   const kid = selectedKids[0]; // On prend le premier KID pour l'analyse
   
-  // Fonction pour parser une performance en pourcentage
-  const parsePerformance = (perfStr: string): number => {
-    if (!perfStr) return 0;
-    // Remplace la virgule par un point et enlève le symbole %
-    return parseFloat(perfStr.replace(',', '.').replace(' %', ''));
-  };
-
   // Transformation des scénarios de performance
   const initialInvestment = kid.performanceScenarios.initialInvestment;
   const performanceScenarios = kid.performanceScenarios.scenarios.map(scenario => {
     // On prend les deux périodes disponibles
     const period1 = scenario.periods[0];
     const period2 = scenario.periods[1];
-    
-    const performance1 = parsePerformance(period1.performance);
-    const performance2 = parsePerformance(period2.performance);
+
+    // Convertir les performances en nombres pour les graphiques
+    const perf1 = period1.annualPerformance ? parseFloat(period1.annualPerformance.replace(',', '.').replace(' %', '')) : 0;
+    const perf2 = period2.annualPerformance ? parseFloat(period2.annualPerformance.replace(',', '.').replace(' %', '')) : 0;
 
     return {
       scenario: scenario.scenarioName,
-      'Période 1': period1.finalAmount,
-      'Période 2': period2.finalAmount,
-      'Performance 1': performance1,
-      'Performance 2': performance2,
-      'performancePeriode1': `${performance1.toFixed(2)}%`,
-      'performancePeriode2': `${performance2.toFixed(2)}%`,
-      'Montant investi': kid.performanceScenarios.initialInvestment
+      [period1.holdingPeriod]: period1.finalAmount,
+      [period2.holdingPeriod]: period2.finalAmount,
+      [`Performance ${period1.holdingPeriod}`]: perf1,
+      [`Performance ${period2.holdingPeriod}`]: perf2,
+      [`performance${period1.holdingPeriod.replace(' ', '')}`]: period1.annualPerformance,
+      [`performance${period2.holdingPeriod.replace(' ', '')}`]: period2.annualPerformance,
+      'Montant investi': initialInvestment
     };
   });
 
+  // Récupérer les périodes du premier scénario
+  const periods = kid.performanceScenarios.scenarios[0].periods.map(p => p.holdingPeriod);
+
   // Calcul de l'évolution des scénarios dans le temps
-  const timeEvolution = ['Période 1', 'Période 2'].map(period => {
+  const timeEvolution = periods.map(period => {
     const favorable = performanceScenarios.find(s => s.scenario === 'Favorable')?.[period] || 0;
     const defavorable = performanceScenarios.find(s => s.scenario === 'Défavorable')?.[period] || 0;
     const tensions = performanceScenarios.find(s => s.scenario === 'Tensions')?.[period] || 0;
@@ -105,8 +102,10 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <AreaChart 
               data={[
                 { période: 'Initial', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, initialInvestment])) },
-                { période: 'Période 1', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['Période 1']])) },
-                { période: 'Période 2', ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s['Période 2']])) }
+                ...periods.map(period => ({
+                  période: period,
+                  ...Object.fromEntries(performanceScenarios.map(s => [s.scenario, s[period]]))
+                }))
               ]}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
@@ -186,8 +185,11 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 <LineChart 
                   data={[
                     { période: 'Initial', montant: initialInvestment, performance: 0 },
-                    { période: 'Période 1', montant: scenario['Période 1'], performance: scenario['Performance 1'] },
-                    { période: 'Période 2', montant: scenario['Période 2'], performance: scenario['Performance 2'] }
+                    ...periods.map(period => ({
+                      période: period,
+                      montant: scenario[period],
+                      performance: scenario[`Performance ${period}`]
+                    }))
                   ]}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 >
@@ -232,19 +234,13 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 <div className="p-4 bg-gray-50 rounded">
                   <p className="text-sm text-gray-600 mb-1">Performance à 1 an</p>
                   <p className="text-base font-medium text-gray-900">
-                    {(scenario['1 an %'] !== undefined && !isNaN(Number(scenario['1 an %']))) 
-                      ? Number(scenario['1 an %']).toFixed(2)
-                      : 'N/A'
-                    } %
+                    {scenario[`performance1an`] || 'N/A %'}
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded">
-                  <p className="text-sm text-gray-600 mb-1">Performance à 5 ans</p>
+                  <p className="text-sm text-gray-600 mb-1">Performance à 8 ans</p>
                   <p className="text-base font-medium text-gray-900">
-                    {(scenario['5 ans %'] !== undefined && !isNaN(Number(scenario['5 ans %']))) 
-                      ? Number(scenario['5 ans %']).toFixed(2)
-                      : 'N/A'
-                    } %
+                    {scenario[`performance8ans`] || 'N/A %'}
                   </p>
                 </div>
               </div>
