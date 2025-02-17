@@ -10,12 +10,22 @@ interface AdvancedAnalyticsProps {
 }
 
 const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) => {
+  // Fonction pour déterminer le type de scénario
+  const getScenarioType = (scenarioName: string): 'favorable' | 'moderate' | 'unfavorable' | 'stress' => {
+    const name = scenarioName.toLowerCase();
+    if (name.includes('favor') || name.includes('optim')) return 'favorable';
+    if (name.includes('moder') || name.includes('inter')) return 'moderate';
+    if (name.includes('defav') || name.includes('unfav') || name.includes('pessi')) return 'unfavorable';
+    if (name.includes('stress') || name.includes('tens')) return 'stress';
+    return 'moderate'; // valeur par défaut
+  };
+
   // Définition des couleurs professionnelles
   const colors = {
     favorable: '#2E7D32',
-    intermediaire: '#1565C0',
-    defavorable: '#E65100',
-    tensions: '#C62828'
+    moderate: '#1565C0',
+    unfavorable: '#E65100',
+    stress: '#C62828'
   };
   // Définition des gradients pour les graphiques
   const gradients = {
@@ -23,16 +33,16 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
       id: 'colorFavorable',
       colors: ['#4ade8040', '#4ade8001']
     },
-    intermediaire: {
-      id: 'colorIntermediaire',
+    moderate: {
+      id: 'colorModerate',
       colors: ['#60a5fa40', '#60a5fa01']
     },
-    defavorable: {
-      id: 'colorDefavorable',
+    unfavorable: {
+      id: 'colorUnfavorable',
       colors: ['#f9731640', '#f9731601']
     },
-    tensions: {
-      id: 'colorTensions',
+    stress: {
+      id: 'colorStress',
       colors: ['#ef444440', '#ef444401']
     }
   };
@@ -80,16 +90,16 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
 
   // Calcul de l'évolution des scénarios dans le temps
   const timeEvolution = periods.map(period => {
-    const favorable = performanceScenarios.find(s => s.scenario === 'Favorable')?.[period] || 0;
-    const defavorable = performanceScenarios.find(s => s.scenario === 'Défavorable')?.[period] || 0;
-    const tensions = performanceScenarios.find(s => s.scenario === 'Tensions')?.[period] || 0;
-    const intermediaire = performanceScenarios.find(s => s.scenario === 'Intermédiaire')?.[period] || 0;
+    const scenarios = performanceScenarios.reduce((acc, s) => {
+      acc[getScenarioType(s.scenario)] = s[period] || 0;
+      return acc;
+    }, {} as Record<string, number>);
 
     return {
       période: period,
-      'Écart favorable/défavorable': favorable - defavorable,
-      'Potentiel de perte': tensions,
-      'Performance moyenne': intermediaire,
+      'Écart favorable/défavorable': (scenarios.favorable || 0) - (scenarios.unfavorable || 0),
+      'Potentiel de perte': scenarios.stress || 0,
+      'Performance moyenne': scenarios.moderate || 0,
       'Montant investi': kid.performanceScenarios.initialInvestment
     };
   });
@@ -143,34 +153,16 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                 height={36}
                 iconType="plainline"
               />
-              <Area 
-                type="monotone" 
-                dataKey="Favorable" 
-                stroke={colors.favorable}
-                strokeWidth={2}
-                fill="none"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="Intermediaire" 
-                stroke={colors.intermediaire}
-                strokeWidth={2}
-                fill="none"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="Defavorable" 
-                stroke={colors.defavorable}
-                strokeWidth={2}
-                fill="none"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="Tensions" 
-                stroke={colors.tensions}
-                strokeWidth={2}
-                fill="none"
-              />
+              {performanceScenarios.map(scenario => (
+                <Area 
+                  key={scenario.scenario}
+                  type="monotone" 
+                  dataKey={scenario.scenario} 
+                  stroke={colors[getScenarioType(scenario.scenario)]}
+                  strokeWidth={2}
+                  fill="none"
+                />
+              ))}
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -224,10 +216,7 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
                   <Line 
                     type="monotone" 
                     dataKey="montant" 
-                    stroke={scenario.scenario === 'Favorable' ? colors.favorable :
-                           scenario.scenario === 'Intermediaire' ? colors.intermediaire :
-                           scenario.scenario === 'Defavorable' ? colors.defavorable :
-                           colors.tensions}
+                    stroke={colors[getScenarioType(scenario.scenario)]}
                     strokeWidth={2}
                     dot={{ strokeWidth: 1, r: 3 }}
                     activeDot={{ r: 4, strokeWidth: 1 }}
@@ -269,10 +258,10 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <h4 className="font-medium text-blue-800 mb-2">Profil Rendement/Risque</h4>
             <p className="text-sm text-blue-600">
               Pour un investissement initial de {kid.performanceScenarios.initialInvestment.toLocaleString()} {kid.productDetails.currency}, 
-              le produit présente une dispersion de performance entre les scénarios favorable et défavorable sur 8 ans.
-              Le scénario intermédiaire montre une évolution sur la période, 
-              avec un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '8 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
-              En cas de scénario de tensions, le montant à 1 an serait de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Tensions')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
+              le produit présente une dispersion de performance entre les scénarios favorable et défavorable sur la durée.
+              Le scénario modéré montre une évolution sur la période, 
+              avec un montant final de {kid.performanceScenarios.scenarios.find(s => getScenarioType(s.scenarioName) === 'moderate')?.periods.find(p => p.holdingPeriod.toLowerCase().includes('mat'))?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
+              En cas de scénario de stress, le montant à 1 an serait de {kid.performanceScenarios.scenarios.find(s => getScenarioType(s.scenarioName) === 'stress')?.periods.find(p => /1|one|un/i.test(p.holdingPeriod))?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
             </p>
           </div>
 
@@ -293,8 +282,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <h4 className="font-medium text-green-800 mb-2">Horizon d'Investissement</h4>
             <p className="text-sm text-green-600">
               La période de détention recommandée est de {kid.redemptionInformation.recommendedHoldingPeriod}. 
-              Dans le scénario défavorable, le montant évolue de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Défavorable')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à 1 an
-              à {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Défavorable')?.periods.find(p => p.holdingPeriod === '8 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à 8 ans.
+              Dans le scénario défavorable, le montant évolue de {kid.performanceScenarios.scenarios.find(s => getScenarioType(s.scenarioName) === 'unfavorable')?.periods.find(p => /1|one|un/i.test(p.holdingPeriod))?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à 1 an
+              à {kid.performanceScenarios.scenarios.find(s => getScenarioType(s.scenarioName) === 'unfavorable')?.periods.find(p => p.holdingPeriod.toLowerCase().includes('mat'))?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à maturité.
               {kid.redemptionInformation.earlyRedemptionPossible && " Le rachat anticipé est possible."}
             </p>
           </div>
