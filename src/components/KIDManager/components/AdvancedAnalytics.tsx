@@ -259,13 +259,10 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <h4 className="font-medium text-blue-800 mb-2">Profil Rendement/Risque</h4>
             <p className="text-sm text-blue-600">
               Pour un investissement initial de {kid.performanceScenarios.initialInvestment.toLocaleString()} {kid.productDetails.currency}, 
-              le produit présente une dispersion de performance de{' '}
-              {((Number(performanceScenarios.find(s => s.scenario === 'Favorable')?.['5 ans']) || 0) - 
-                (Number(performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans']) || 0)).toFixed(1)}% 
-              sur 5 ans. Le scénario intermédiaire montre un rendement de {(Number(performanceScenarios.find(s => s.scenario === 'Intermediaire')?.['5 ans']) || 0).toFixed(1)}% 
-              sur 5 ans, soit un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
-              En cas de scénario de tensions, la perte maximale à 1 an pourrait atteindre {Math.abs(Number(performanceScenarios.find(s => s.scenario === 'Tensions')?.['1 an']) || 0).toFixed(1)}%, 
-              soit un montant de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Tensions')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount.toLocaleString()} {kid.productDetails.currency}.
+              le produit présente une dispersion de performance entre les scénarios favorable et défavorable sur 8 ans.
+              Le scénario intermédiaire montre une évolution sur la période, 
+              avec un montant final de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Intermediaire')?.periods.find(p => p.holdingPeriod === '8 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
+              En cas de scénario de tensions, le montant à 1 an serait de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Tensions')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency}.
             </p>
           </div>
 
@@ -282,10 +279,8 @@ const AdvancedAnalytics: React.FC<AdvancedAnalyticsProps> = ({ selectedKids }) =
             <h4 className="font-medium text-green-800 mb-2">Horizon d'Investissement</h4>
             <p className="text-sm text-green-600">
               La période de détention recommandée est de {kid.redemptionInformation.recommendedHoldingPeriod}. 
-              Dans le scénario défavorable, la performance s'améliore de {performanceScenarios.find(s => s.scenario === 'Defavorable')?.['1 an']}% à 1 an 
-              ({kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Defavorable')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount.toLocaleString()} {kid.productDetails.currency}) 
-              à {performanceScenarios.find(s => s.scenario === 'Defavorable')?.['5 ans']}% à 5 ans
-              ({kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Defavorable')?.periods.find(p => p.holdingPeriod === '5 ans')?.finalAmount.toLocaleString()} {kid.productDetails.currency}).
+              Dans le scénario défavorable, le montant évolue de {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Défavorable')?.periods.find(p => p.holdingPeriod === '1 an')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à 1 an
+              à {kid.performanceScenarios.scenarios.find(s => s.scenarioName === 'Défavorable')?.periods.find(p => p.holdingPeriod === '8 ans')?.finalAmount?.toLocaleString() || 'N/A'} {kid.productDetails.currency} à 8 ans.
               {kid.redemptionInformation.earlyRedemptionPossible && " Le rachat anticipé est possible."}
             </p>
           </div>
